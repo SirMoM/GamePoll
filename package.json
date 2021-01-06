@@ -1,0 +1,27 @@
+{
+    "name": "gamepoll",
+    "version": "1.0.0",
+    "description": "A discord bot for polling for players.",
+    "main": "index.js",
+    "scripts": {
+        "test": "node index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/SirMoM/GamePoll.git"
+    },
+    "keywords": [
+        "bot",
+        "discord"
+    ],
+    "author": "Sir.MoM",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/shiffman/Discord-Bot-A2Z/issues"
+    },
+    "homepage": "https://github.com/shiffman/Discord-Bot-A2Z#readme",
+    "dependencies": {
+        "discord.js": "^12.5.1",
+        "dotenv": "^8.2.0"
+    }
+}
