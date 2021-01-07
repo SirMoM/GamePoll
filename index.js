@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
-
+const BOT_ID = "795980245400420363"
 require("dotenv").config();
 
 const serverID = process.env.SERVERID;
@@ -12,13 +12,46 @@ client.on("ready", readyDiscord);
 
 const prefix = "!";
 
-let msg_ids = [];
+const thumbnails = ["https://media.steampowered.com/apps/csgo/blog/images/fb_image.png", "https://cdn-images.win.gg/resize/w/932/h/420/format/jpg/type/progressive/fit/cover/path/news/c34a7191f6e9948068b83e7179ea3da8/4938da24cbb9028a008390afb863ff89/original.jpg"]
 
 function readyDiscord() {
     console.log("Logged in!");
 }
 
+client.on("messageReactionRemove", edit_emb);
+
+client.on("messageReactionAdd", edit_emb);
+
 client.on("message", gotMessage);
+
+function gotMessage(message) {
+    if (message.guild.id === serverID && message.channel.id === channelID) {
+        if (message.content.startsWith(`${prefix}gp`)) {
+            // Parsing command
+            const args = message.content.slice(prefix.length).trim().split(/ +/);
+            const command = args.shift().toLowerCase();
+
+            if (!args.length) {
+                message.channel.send(
+                    `Du hast keine Argumente angegeben, ${message.author}!\nFür mehr Informationen: !gp --help`
+                );
+                return message.channel.send("!gp <time> <game_tag>");
+            } else if (args[0] === "--help") {
+                let gp_help = "usage: !gp <time> <game_tag>\n" +
+                    "\t The arguments are:\n" +
+                    `\t\t <time>\t\t\t  The time when you want to play the game. Examples: 21:00, now\n` +
+                    `\t\t <game_tag>\tThe tag that specifies who gehts notified. Examples: ${message.author}\n\n` +
+                    "\t This help can be shown with !gp --help";
+                return message.channel.send(gp_help);
+            } else if (args.length === 2) {
+                let msg_emb = emb(args[0], args[1]);
+                message.channel.send(msg_emb).then((sent) => {
+                    sent.react("✅").then(() => sent.react("🅱️"));
+                });
+            }
+        }
+    }
+}
 
 function emb(_time, _game) {
     return (
@@ -34,187 +67,69 @@ function emb(_time, _game) {
         )
         .addField("Emojis", "✅ = bin dabei!\n🅱️ = ich weiß nicht (Backup)!\n")
         .setTimestamp()
-        // .setThumbnail(
-        //   "https://media.steampowered.com/apps/csgo/blog/images/fb_image.png"
-        // )
-        .setThumbnail(
-            "https://cdn-images.win.gg/resize/w/932/h/420/format/jpg/type/progressive/fit/cover/path/news/c34a7191f6e9948068b83e7179ea3da8/4938da24cbb9028a008390afb863ff89/original.jpg"
-        )
+        .setThumbnail(thumbnails[Math.random() * thumbnails.length])
     );
 }
 
-const filter = (reaction, user) => {
-    return (
+async function edit_emb(reaction, user) {
+    // When we receive a reaction we check if the reaction is partial or not
+    if (reaction.partial) {
+        // If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
+        try {
+            await reaction.fetch();
+        } catch (error) {
+            console.error("Something went wrong when fetching the message: ", error);
+            // Return as `reaction.message.author` may be undefined/null
+            return;
+        }
+    }
+    if (
         (reaction.emoji.name === "✅" || reaction.emoji.name === "🅱️") &&
-        !(user.id == 795980245400420363)
-    );
-};
+        !(user.id == BOT_ID)
+    ) {
+        let msg_reactions = reaction.message.reactions
 
-function gotMessage(message) {
-    if (message.guild.id === serverID && message.channel.id === channelID) {
-        if (message.content.startsWith(`${prefix}gp`)) {
-            // Parsing command
-            const args = message.content.slice(prefix.length).trim().split(/ +/);
-            const command = args.shift().toLowerCase();
-            console.log(command);
-            console.log(args);
+        // Edit message
+        let msg_emb = reaction.message.embeds[0];
+        // Remove Fields if neccesary
+        if (msg_emb.fields.length > 1) {
+            msg_emb.fields.splice(1, 2);
+        }
 
-            if (!args.length) {
-                return message.channel.send(
-                    `Du hast keine Argumente angegeben, ${message.author}!\nFür mehr Informationen: !gp help`
-                );
-            } else if (args[0] === "help") {
-                return message.channel.send("!gb <time> <game>");
-            } else if (args.length === 2) {
-                let msg_emb = emb(args[0], args[1]);
-                message.channel.send(msg_emb).then((sent) => {
-                    msg_ids.push(sent.id);
-                    sent.react("✅").then(() => sent.react("🅱️"));
-                });
+        let [roster, backup] = manage_roster(msg_reactions)
+        msg_emb.addFields({ name: "Roster", value: roster, inline: true }, { name: "Backup", value: backup, inline: true });
+        reaction.message.edit(msg_emb);
+    }
+}
+
+function manage_roster(msg_reactions) {
+    let roster = ""
+    let backup = ""
+    let count = 0
+
+    msg_reactions.cache.get("✅").users.cache.forEach(item => {
+        if (item.id != BOT_ID) {
+            roster += "<@" + item.id + ">\n";
+            count++
+            console.log(count)
+            if (count >= 5) {
+                backup += "<@" + item.id + ">\n";
             }
         }
+    })
+
+    msg_reactions.cache.get("🅱️").users.cache.forEach(item => {
+        if (item.id != BOT_ID) {
+            backup += "<@" + item.id + ">\n";
+        }
+    })
+
+    if (roster.length === 0) {
+        roster += "...";
     }
-}
-client.on("messageReactionRemove", async(reaction, user) => {
-    // When we receive a reaction we check if the reaction is partial or not
-    if (reaction.partial) {
-        // If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
-        try {
-            await reaction.fetch();
-        } catch (error) {
-            console.error("Something went wrong when fetching the message: ", error);
-            // Return as `reaction.message.author` may be undefined/null
-            return;
-        }
-    }
-
-    let msg_id = reaction.message.id;
-    if (
-        (reaction.emoji.name === "✅" || reaction.emoji.name === "🅱️") &&
-        !(user.id == 795980245400420363)
-    ) {
-        // # roster / backup manipulation
-        if (reaction.emoji.name === "🅱️") {
-            manage_backup(msg_id, user.id, true);
-        }
-        if (reaction.emoji.name === "✅") {
-            manage_roster(msg_id, user.id, true);
-        }
-
-        // Edit message
-        let msg_emb = reaction.message.embeds[0];
-
-        if (msg_emb.fields.length > 1) {
-            msg_emb.fields.splice(1, 2);
-        }
-
-        msg_emb.addFields({ name: "Roster", value: get_roster(msg_id), inline: true }, { name: "Backup", value: get_backup(msg_id), inline: true });
-        reaction.message.edit(msg_emb);
-    }
-});
-
-client.on("messageReactionAdd", async(reaction, user) => {
-    // When we receive a reaction we check if the reaction is partial or not
-    if (reaction.partial) {
-        // If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
-        try {
-            await reaction.fetch();
-        } catch (error) {
-            console.error("Something went wrong when fetching the message: ", error);
-            // Return as `reaction.message.author` may be undefined/null
-            return;
-        }
-    }
-    if (
-        (reaction.emoji.name === "✅" || reaction.emoji.name === "🅱️") &&
-        !(user.id == 795980245400420363)
-    ) {
-        // # roster / backup manipulation
-        let msg_id = reaction.message.id;
-        if (!rosters.has(msg_ids)) {
-            rosters.set(msg_id, []);
-            backups.set(msg_id, []);
-        }
-
-        if (reaction.emoji.name === "🅱️") {
-            manage_backup(msg_id, user.id);
-        }
-        if (reaction.emoji.name === "✅") {
-            manage_roster(msg_id, user.id);
-        }
-
-        // Edit message
-        let msg_emb = reaction.message.embeds[0];
-
-        if (msg_emb.fields.length > 1) {
-            msg_emb.fields.splice(1, 2);
-        }
-
-        msg_emb.addFields({ name: "Roster", value: get_roster(msg_id), inline: true }, { name: "Backup", value: get_backup(msg_id), inline: true });
-        reaction.message.edit(msg_emb);
-    }
-});
-
-let rosters = new Map();
-let backups = new Map();
-
-function manage_roster(msg_id, user_id, del = false) {
-    let roster = rosters.get(msg_id);
-    if (del) {
-        const index = roster.indexOf(user_id);
-        if (index > -1) {
-            roster.splice(index, 1);
-            return;
-        }
+    if (backup.length === 0) {
+        backup += "...";
     }
 
-    if (undefined === roster.find((element) => element === user_id)) {
-        if (roster.length >= 5) {
-            manage_backup(msg_id, user_id);
-            return;
-        }
-        roster.push(user_id);
-        console.log("User added to roster " + msg_id + ": " + user_id);
-    }
-}
-
-function manage_backup(msg_id, user_id, del = false) {
-    let backup = backups.get(msg_id);
-
-    if (del) {
-        const index = backup.indexOf(user_id);
-        if (index > -1) {
-            backup.splice(index, 1);
-            return;
-        }
-    }
-
-    if (undefined === backup.find((element) => element === user_id)) {
-        backup.push(user_id);
-        console.log("User added to backup " + msg_id + ": " + user_id);
-    }
-}
-
-function get_roster(msg_id) {
-    let result = "";
-    let roster = rosters.get(msg_id);
-    roster.forEach((player) => {
-        result += "<@" + player + ">\n";
-    });
-    if (result.length === 0) {
-        result += "...";
-    }
-    return result;
-}
-
-function get_backup(msg_id) {
-    let result = "";
-    let backup = backups.get(msg_id);
-    backup.forEach((player) => {
-        result += "<@" + player + ">\n";
-    });
-    if (result.length === 0) {
-        result += "...";
-    }
-    return result;
+    return [roster, backup];
 }

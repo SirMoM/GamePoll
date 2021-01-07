@@ -4,24 +4,29 @@
     "description": "A discord bot for polling for players.",
     "main": "index.js",
     "scripts": {
-        "test": "node index.js"
+      "test": "node index.js",
+      "start": "node index.js"
+    },
+    "engines": {
+      "node": "15.x"
     },
     "repository": {
-        "type": "git",
-        "url": "https://github.com/SirMoM/GamePoll.git"
+      "type": "git",
+      "url": "https://github.com/SirMoM/GamePoll.git"
     },
     "keywords": [
-        "bot",
-        "discord"
+      "bot",
+      "discord"
     ],
     "author": "Sir.MoM",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/shiffman/Discord-Bot-A2Z/issues"
+      "url": "https://github.com/shiffman/Discord-Bot-A2Z/issues"
     },
     "homepage": "https://github.com/shiffman/Discord-Bot-A2Z#readme",
     "dependencies": {
-        "discord.js": "^12.5.1",
-        "dotenv": "^8.2.0"
+      "discord.js": "^12.5.1",
+      "dotenv": "^8.2.0"
     }
-}
+  }
+  
