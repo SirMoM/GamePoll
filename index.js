@@ -57,13 +57,13 @@ function emb(_time, _game) {
     return (
         new Discord.MessageEmbed()
         .setColor("#5599ff")
-        .setTitle("CS:GO")
+        .setTitle(_game)
         .setDescription(
             "So " +
             _time +
             " ist der Call meine Freunde!\n\n" +
-            "**Bitte reagiert mit einem Emoji sonst kann es sein, dass ihr nicht mitmachen könnt, da ggf. sonst kein Platz mehr frei ist**\n" +
-            _game
+            "**Bitte reagiert mit einem Emoji sonst kann es sein, dass ihr nicht mitmachen könnt, da ggf. sonst kein Platz mehr frei ist**\n"
+            //+ _game
         )
         .addField("Emojis", "✅ = bin dabei!\n🅱️ = ich weiß nicht (Backup)!\n")
         .setTimestamp()
@@ -111,7 +111,6 @@ function manage_roster(msg_reactions) {
         if (item.id != BOT_ID) {
             roster += "<@" + item.id + ">\n";
             count++
-            console.log(count)
             if (count >= 5) {
                 backup += "<@" + item.id + ">\n";
             }
@@ -133,3 +132,15 @@ function manage_roster(msg_reactions) {
 
     return [roster, backup];
 }
+
+const express = require('express')
+const app = express()
+const port = 3000
+
+app.get('/', (req, res) => {
+    res.send('Hello World!')
+})
+
+app.listen(process.env.PORT || port, () => {
+    console.log(`Example app listening at ${port}`)
+})
