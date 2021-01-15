@@ -1,0 +1,33 @@
+{
+    "generic-game-poll": {
+        "title": "Gayming-Anfragen",
+        "time-text": "So meine Freunde **{time}** ist der Call!",
+        "additional-text": "**Bitte reagiert mit einem Emoji sonst kann es sein, dass ihr nicht mitmachen könnt, da ggf. sonst kein Platz mehr frei ist**",
+        "explain-emojis": "✅ = bin dabei!\n🅱️ = ich weiß nicht (Backup)!"
+    },
+    "games": {
+        "CSGO": {
+            "tag": "@CS:GO",
+            "thumbnails": ["https://cdn-images.win.gg/resize/w/932/h/420/format/jpg/type/progressive/fit/cover/path/news/c34a7191f6e9948068b83e7179ea3da8/4938da24cbb9028a008390afb863ff89/original.jpg"],
+            "roster-size": 5,
+            "color": "#5599ff"
+        },
+        "LOL": {
+            "tag": "@LOL",
+            "thumbnails": [],
+            "roster-size": 5,
+            "color": "#559900"
+        },
+        "CIV": {
+            "tag": "@CIV",
+            "thumbnails": [],
+            "roster-size": -1,
+            "color": "#7CFC00"
+        }
+    },
+    "default-emb": {
+        "thumbnails": [],
+        "roster-size": -1,
+        "color": "#5599ff"
+    }
+}
