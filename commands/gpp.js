@@ -15,8 +15,6 @@ function emb(_time, _game) {
     if (!game) {
         game = config["default-emb"]
     }
-    console.log("Game config: ")
-    console.log(game)
     return (
         new Discord.MessageEmbed()
         .setColor(game.color)
@@ -54,7 +52,6 @@ module.exports = function(message, args) {
             var fs = require('fs');
             fs.writeFile("./past_messages.json", json, 'utf8', (callback) => {
                 if (callback) throw callback;
-                console.log("Message saved!");
             });
         });
 

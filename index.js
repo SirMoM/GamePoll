@@ -1,5 +1,6 @@
 const Discord = require("discord.js");
 const CommandHandler = require("./commands/command-handler")
+const config = require("./commands/config.json")
 require("dotenv").config();
 const client = new Discord.Client();
 
@@ -52,25 +53,28 @@ async function edit_emb(reaction, user) {
         if (msg_emb.fields.length > 1) {
             msg_emb.fields.splice(1, 2);
         }
-
-        let [roster, backup] = manage_roster(msg_reactions)
+        const [game_tag] = msg_emb.description.split("\n").slice(-1)
+        let game = get_game_from_config(game_tag)
+        let [roster, backup] = manage_roster(msg_reactions, game)
         msg_emb.addFields({ name: "Roster", value: roster, inline: true }, { name: "Backup", value: backup, inline: true });
         reaction.message.edit(msg_emb);
     }
 }
 
-function manage_roster(msg_reactions) {
+function manage_roster(msg_reactions, game) {
     let roster = ""
     let backup = ""
     let count = 0
 
     msg_reactions.cache.get("✅").users.cache.forEach(item => {
         if (item.id != BOT_ID) {
-            roster += "<@" + item.id + ">\n";
-            count++
-            if (count >= 5) {
+
+            if (game["roster-size"] >= 0 && count >= game["roster-size"]) { /* ! TODO Using the message game to determin the amount of players allowed in the game at once */
                 backup += "<@" + item.id + ">\n";
+            } else {
+                roster += "<@" + item.id + ">\n";
             }
+            count++
         }
     })
 
@@ -129,3 +133,18 @@ app.get('/past_messages', (req, res) => {
 app.listen(process.env.PORT || port, () => {
     console.log(`Bot listening at ${port}`)
 })
+
+function get_game_from_config(game_tag) {
+    let game
+    for (game_key in config.games) {
+        g = config.games[game_key]
+        if (g.tag === game_tag) {
+            game = g
+            break;
+        }
+    }
+    if (!game) {
+        game = config["default-emb"]
+    }
+    return game
+}

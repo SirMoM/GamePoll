@@ -8,25 +8,25 @@
     "games": {
         "CSGO": {
             "tag": "@CS:GO",
-            "thumbnails": ["https://cdn-images.win.gg/resize/w/932/h/420/format/jpg/type/progressive/fit/cover/path/news/c34a7191f6e9948068b83e7179ea3da8/4938da24cbb9028a008390afb863ff89/original.jpg"],
+            "thumbnails": ["https://cdn-images.win.gg/resize/w/932/h/420/format/jpg/type/progressive/fit/cover/path/news/c34a7191f6e9948068b83e7179ea3da8/4938da24cbb9028a008390afb863ff89/original.jpg", "https://i.pinimg.com/originals/01/db/df/01dbdf785d7fc32eb7ee45323a789e15.jpg", "https://i.imgur.com/OVRkXCM.jpg", "https://i.redd.it/ca2kalp8sks41.jpg"],
             "roster-size": 5,
-            "color": "#5599ff"
+            "color": "#FF1493"
         },
         "LOL": {
-            "tag": "@LOL",
-            "thumbnails": [],
+            "tag": "@League of Legends",
+            "thumbnails": ["https://www.riotgames.com/darkroom/800/da85e92aaf87f26181ded41afe03b1dc:aaeeccb4b282b616ef907ec68c40f2b7/lol-logo-rendered-hi-res.png", "https://opgg-static.akamaized.net/images/medals/iron_1.png", "https://pbs.twimg.com/media/D7wrK9pXoAEKfxh.png"],
             "roster-size": 5,
-            "color": "#559900"
+            "color": "#FFFFFF"
         },
         "CIV": {
-            "tag": "@CIV",
-            "thumbnails": [],
+            "tag": "@CIV VI",
+            "thumbnails": ["https://i.imgur.com/3OLTFVq.jpg"],
             "roster-size": -1,
             "color": "#7CFC00"
         }
     },
     "default-emb": {
-        "thumbnails": [],
+        "thumbnails": ["https://media1.tenor.com/images/fc622dcea2ec86828f89b3a9e4ae07e0/tenor.gif"],
         "roster-size": -1,
         "color": "#5599ff"
     }

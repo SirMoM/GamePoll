@@ -14,8 +14,6 @@ function emb(_time, _game) {
     if (!game) {
         game = config["default-emb"]
     }
-    console.log("Game config: ")
-    console.log(game)
     return (
         new Discord.MessageEmbed()
         .setColor(game.color)
@@ -45,7 +43,6 @@ module.exports = function(message, args) {
         return message.channel.send(gp_help);
     } else if (args.length === 2) {
         let msg_emb = emb(args[0], args[1]);
-        console.log(msg_emb)
         message.channel.send(msg_emb).then((sent) => {
             sent.react("✅").then(() => sent.react("🅱️"));
         });
