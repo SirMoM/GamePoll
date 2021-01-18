@@ -122,6 +122,10 @@ app.get('/config', (req, res) => {
     res.send(require("./commands/config.json"))
 })
 
+app.get('/past_messages', (req, res) => {
+    res.send(require("./past_messages.json"))
+})
+
 app.listen(process.env.PORT || port, () => {
     console.log(`Bot listening at ${port}`)
 })
