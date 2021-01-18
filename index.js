@@ -12,13 +12,7 @@ console.log("Starting Bot: Beep beep! 🤖");
 client.login(process.env.TOKEN);
 client.on("ready", () => {
     console.log("Logged in!");
-    client.user.setPresence({
-        game: {
-            name: 'my code',
-            type: 'WATCHING'
-        },
-        status: 'Online'
-    });
+    client.user.setActivity("dir zu. Du machst das großartig!", { type: "WATCHING", url: "https://github.com/SirMoM/GamePoll" })
     load_messages()
 });
 
