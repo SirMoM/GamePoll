@@ -23,6 +23,12 @@
             "thumbnails": ["https://i.imgur.com/3OLTFVq.jpg"],
             "roster-size": -1,
             "color": "#7CFC00"
+        },
+        "SoT": {
+            "tag": "806598835244630046",
+            "thumbnails": ["https://i.pinimg.com/originals/a4/f1/f3/a4f1f3572c496388dc97b925d4c1508f.jpg"],
+            "roster-size": 4,
+            "color": "#7CFCF0"
         }
     },
     "default-emb": {
