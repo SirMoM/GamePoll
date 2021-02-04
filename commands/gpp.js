@@ -1,36 +1,5 @@
-const Discord = require("discord.js");
-const config = require("./config.json")
+let emb = require('./discord-emb.js')
 let past_messages = require("../past_messages.json")
-
-function emb(_time, _game) {
-    let game
-
-    for (game_key in config.games) {
-        g = config.games[game_key]
-        if (g.tag === _game) {
-            game = g
-            break;
-        }
-    }
-    if (!game) {
-        game = config["default-emb"]
-    }
-    return (
-        new Discord.MessageEmbed()
-        .setColor(game.color)
-        .setTitle(config["generic-game-poll"].title)
-        .setDescription(
-            config["generic-game-poll"]["time-text"].replace("{time}", _time) +
-            "\n\n" +
-            config["generic-game-poll"]["additional-text"] +
-            "\n\n" +
-            _game
-        )
-        .addField("Emojis", config["generic-game-poll"]["explain-emojis"] + "\n")
-        .setTimestamp()
-        .setThumbnail(game.thumbnails[Math.floor(Math.random() * game.thumbnails.length)])
-    );
-}
 
 module.exports = function(message, args) {
     if (args[0] === "--help") {

@@ -7,32 +7,32 @@
     },
     "games": {
         "CSGO": {
-            "tag": "801912543252578365",
+            "tag": "714530296296505344",
             "thumbnails": ["https://cdn-images.win.gg/resize/w/932/h/420/format/jpg/type/progressive/fit/cover/path/news/c34a7191f6e9948068b83e7179ea3da8/4938da24cbb9028a008390afb863ff89/original.jpg", "https://i.pinimg.com/originals/01/db/df/01dbdf785d7fc32eb7ee45323a789e15.jpg", "https://i.imgur.com/OVRkXCM.jpg", "https://i.redd.it/ca2kalp8sks41.jpg"],
             "roster-size": 5,
             "color": "#FF1493"
         },
         "LOL": {
-            "tag": "804631943143882782",
+            "tag": "714530690988769281",
             "thumbnails": ["https://www.riotgames.com/darkroom/800/da85e92aaf87f26181ded41afe03b1dc:aaeeccb4b282b616ef907ec68c40f2b7/lol-logo-rendered-hi-res.png", "https://opgg-static.akamaized.net/images/medals/iron_1.png", "https://pbs.twimg.com/media/D7wrK9pXoAEKfxh.png"],
             "roster-size": 5,
             "color": "#FFFFFF"
         },
         "CIV": {
-            "tag": "804041438756864042",
+            "tag": "714538595725213897",
             "thumbnails": ["https://i.imgur.com/3OLTFVq.jpg"],
             "roster-size": -1,
             "color": "#7CFC00"
         },
         "SoT": {
-            "tag": "806598835244630046",
+            "tag": "803920848872144896",
             "thumbnails": ["https://i.pinimg.com/originals/a4/f1/f3/a4f1f3572c496388dc97b925d4c1508f.jpg"],
             "roster-size": 4,
             "color": "#7CFCF0"
         }
     },
     "default-emb": {
-        "thumbnails": ["https://media1.tenor.com/images/fc622dcea2ec86828f89b3a9e4ae07e0/tenor.gif"],
+        "thumbnails": ["https://media1.tenor.com/images/fc622dcea2ec86828f89b3a9e4ae07e0/tenor.gif", "https://wallpapercave.com/wp/wp5498323.png", "https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/a/a9/Unicorns_Of_Lovelogo_square.png/revision/latest/scale-to-width-down/307?cb=20200516013946", "https://cdn0.gamesports.net/edb_team_logos/21000/21801.png?1582027029"],
         "roster-size": -1,
         "color": "#5599ff"
     }
