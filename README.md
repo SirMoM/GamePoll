@@ -56,3 +56,31 @@ You can the the endpoints [here](https://petstore.swagger.io/?url=https://raw.gi
   * get
   * post
   * delete
+  
+# Bot configuration
+Json file with the following attributes:
+
+* generic-game-poll: generic information for the polls
+  * title: The title of the Poll
+  <br> Example: `"Who want's to play"`
+  * time-text: The text encapsulating the time to poll for. The place for the time is marked by **`{time}`**.
+  <br> Example: `"Let's play at {time}!"`
+  * additional-text: Flavor text for the poll
+  * explain-emojis: Text to explay the use of the reaction emojis
+  <br> Example: `"✅ = bin dabei!\n🅱️ = ich weiß nicht (Backup)!"`
+* games: Configuration for specefic games
+  * `<EntryName>`
+    * tag: id for the people to tag, the game is determined by this
+    * thumbnails: An array full of thumbnails to use for the poll banner (this is game specific)
+    * roster-size: Number of people for the roster, the accses are put in backup
+    * color: Color of the Poll as a hex string
+
+Example: 
+```
+"LOL": {
+    "tag": "714530690988769281",
+    "thumbnails": ["https://pbs.twimg.com/media/D7wrK9pXoAEKfxh.png"],
+    "roster-size": 5,
+    "color": "#FFFFFF"
+}
+```
