@@ -6,7 +6,6 @@
 A discord bot for polling/finding people to play with.
 
 
-
 Commands: !gp, !gpg, !gpp, !gphelp
 ```
 usage:
@@ -43,5 +42,17 @@ usage:
 
     !gpg --help
         Shows the help for the !gp command
+```
 
+# Manipulation the data via REST-endpoints
 
+You can the the endpoints [here](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/SirMoM/GamePoll/main/openapi.yaml).
+
+## Endpoints
+
+* /config
+  * get
+* /past_messages
+  * get
+  * post
+  * delete
