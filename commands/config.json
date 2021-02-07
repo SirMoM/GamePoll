@@ -29,6 +29,12 @@
             "thumbnails": ["https://i.pinimg.com/originals/a4/f1/f3/a4f1f3572c496388dc97b925d4c1508f.jpg"],
             "roster-size": 4,
             "color": "#7CFCF0"
+        },
+        "OW": {
+            "tag": "714508396820168837",
+            "thumbnails": ["https://i.ytimg.com/vi/ZliYW8QUQpg/hqdefault.jpg", "https://images-cdn.9gag.com/photo/adK2onB_700b.jpg", "https://imgur.com/gallery/9qDVW", "https://pbs.twimg.com/media/CnbIQN5UsAA55kV?format=jpg&name=360x360"],
+            "roster-size": 6,
+            "color": "#8B5A2B"
         }
     },
     "default-emb": {
