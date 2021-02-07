@@ -119,9 +119,36 @@ app.get('/', (req, res) => {
 app.get('/config', (req, res) => {
     res.send(require("./commands/config.json"))
 })
-
 app.get('/past_messages', (req, res) => {
     res.send(require("./past_messages.json"))
+})
+
+app.post('/past_messages/:msgId', (req, res) => {
+    let msgId = req.params["msgId"]
+
+    past_messages.push(msgId)
+
+    let json = JSON.stringify(past_messages)
+    var fs = require('fs');
+    fs.writeFile("./past_messages.json", json, 'utf8', (callback) => {
+        if (callback) throw callback;
+    });
+
+    res.send("Added " + msgId + " msgId");
+});
+
+app.delete('/past_messages/:msgId', (req, res) => {
+    let msgId = req.params["msgId"];
+
+    past_messages.splice(past_messages.indexOf(msgId), 1);
+
+    let json = JSON.stringify(past_messages);
+    var fs = require('fs');
+    fs.writeFile("./past_messages.json", json, 'utf8', (callback) => {
+        if (callback) throw callback;
+    });
+
+    res.send("Delete " + msgId + " msgId");
 })
 
 app.listen(process.env.PORT || port, () => {
