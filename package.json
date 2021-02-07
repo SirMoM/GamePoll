@@ -1,6 +1,6 @@
 {
     "name": "gamepoll",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "A discord bot for polling/finding people to play with.",
     "main": "index.js",
     "scripts": {

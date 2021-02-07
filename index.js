@@ -135,6 +135,7 @@ app.post('/past_messages/:msgId', (req, res) => {
     });
 
     res.send("Added " + msgId + " msgId");
+    load_messages()
 });
 
 app.delete('/past_messages/:msgId', (req, res) => {
@@ -149,6 +150,7 @@ app.delete('/past_messages/:msgId', (req, res) => {
     });
 
     res.send("Delete " + msgId + " msgId");
+    load_messages()
 })
 
 app.listen(process.env.PORT || port, () => {
