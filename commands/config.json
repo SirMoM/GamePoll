@@ -35,7 +35,15 @@
             "thumbnails": ["https://i.ytimg.com/vi/ZliYW8QUQpg/hqdefault.jpg", "https://images-cdn.9gag.com/photo/adK2onB_700b.jpg", "https://imgur.com/gallery/9qDVW", "https://pbs.twimg.com/media/CnbIQN5UsAA55kV?format=jpg&name=360x360"],
             "roster-size": 6,
             "color": "#8B5A2B"
-        }
+        },
+		"VALO": {
+			"tag": "841747666357452820",
+            "thumbnails": ["https://www.tz.de/bilder/2020/04/22/13697885/1767528527-valorant-beta-keys-lange-dauert-twitch-drop-kommt-2uQIjHSgYmef.jpg"],
+            "roster-size": 5,
+            "color": "#FF1493"
+			
+			
+		}
     },
     "default-emb": {
         "thumbnails": ["https://media1.tenor.com/images/fc622dcea2ec86828f89b3a9e4ae07e0/tenor.gif", "https://wallpapercave.com/wp/wp5498323.png", "https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/a/a9/Unicorns_Of_Lovelogo_square.png/revision/latest/scale-to-width-down/307?cb=20200516013946", "https://cdn0.gamesports.net/edb_team_logos/21000/21801.png?1582027029"],
