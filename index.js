@@ -50,7 +50,10 @@ async function edit_emb(reaction, user) {
         const [game_tag] = msg_emb.description.split("\n").slice(-1)
         let game = get_game_from_config(game_tag)
         let [roster, backup] = manage_roster(msg_reactions, game)
-        msg_emb.addFields({ name: "Roster", value: roster, inline: true }, { name: "Backup", value: backup, inline: true });
+        console.log("Roster: " + roster)
+        console.log("Backup " + backup)
+        msg_emb.addFields({ name: "Roster", value: roster, inline: true });
+        msg_emb.addFields({ name: "Backup", value: backup, inline: true });
         reaction.message.edit(msg_emb);
     }
 }
@@ -59,11 +62,11 @@ function manage_roster(msg_reactions, game) {
     let roster = ""
     let backup = ""
     let count = 0
-
     msg_reactions.cache.get("✅").users.cache.forEach(item => {
         if (item.id != BOT_ID) {
-
-            if (game["roster-size"] >= 0 && count >= game["roster-size"]) { /* ! TODO Using the message game to determin the amount of players allowed in the game at once */
+            let addToBackup = game["roster-size"] >= 0 && count >= game["roster-size"]
+            console.log("Roster size " + game["roster-size"] + " players " + count + " will be added to backup " + addToBackup)
+            if (addToBackup) {
                 backup += "<@" + item.id + ">\n";
             } else {
                 roster += "<@" + item.id + ">\n";
