@@ -12,12 +12,20 @@ module.exports = async function(message) {
     const channelID = process.env.CHANNELID;
 
     if (message.guild === null || (message.guild.id === serverID && message.channel.id === channelID)) {
-        let tokens = message.content.split(' ');
+        let msgContent = message.content
+        let tokens
+        if (!msgContent.match('".*"')) {
+            tokens = msgContent.split(' ');
+        } else {
+            tokens = generateTokens(msgContent)
+        }
+
         let command = tokens.shift();
         if (command.charAt(0) === prefix) {
             command = command.substring(1);
             console.log("Command: " + command)
             console.log("Args: " + tokens)
+
             if (commands.hasOwnProperty(command)) {
                 commands[command](message, tokens);
             } else if (command === "gphelp") {
@@ -30,4 +38,18 @@ module.exports = async function(message) {
 
         }
     }
+}
+
+function generateTokens(msgContent) {
+    let regex = RegExp("(!\\w+) (\".*\"|\\w) (\\w+)", "i")
+
+    let matches = msgContent.match(regex)
+    console.log("Regex result " + matches)
+    matches.shift() // remove input
+    let tokens = []
+    matches.forEach(element => { // Replace "" for nicer output
+        tokens.push(element.replaceAll("\"", ""))
+    });
+
+    return tokens
 }
