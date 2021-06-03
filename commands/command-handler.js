@@ -41,7 +41,7 @@ module.exports = async function(message) {
 }
 
 function generateTokens(msgContent) {
-    let regex = RegExp("(!\\w+) (\".*\"|\\w) (\\w+)", "i")
+    let regex = RegExp("(!\\w+) (\".*\"|\\w) (.+)", "i")
 
     let matches = msgContent.match(regex)
     console.log("Regex result " + matches)
