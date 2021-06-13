@@ -31,6 +31,8 @@ module.exports = function emb(_time, _game) {
             _game
         )
         .addField("Emojis", config["generic-game-poll"]["explain-emojis"] + "\n")
+        .addFields({ name: "Roster", value: "...", inline: true })
+        .addFields({ name: "Backup", value: "...", inline: true })
         .setTimestamp()
         .setThumbnail(game.thumbnails[Math.floor(Math.random() * game.thumbnails.length)])
     );

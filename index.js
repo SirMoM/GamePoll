@@ -43,17 +43,26 @@ async function edit_emb(reaction, user) {
 
         // Edit message
         let msg_emb = reaction.message.embeds[0];
-        // Remove Fields if neccesary
-        if (msg_emb.fields.length > 1) {
-            msg_emb.fields.splice(1, 2);
-        }
+        // Get index to override fields
+        let roster_field_id = -1
+        let backup_field_id = -1
+
+        msg_emb.fields.forEach(field => {
+            if (field.name === 'Roster') {
+                roster_field_id = msg_emb.fields.indexOf(field)
+            } else if (field.name === 'Backup') {
+                backup_field_id = msg_emb.fields.indexOf(field)
+            }
+
+        })
+
         const [game_tag] = msg_emb.description.split("\n").slice(-1)
         let game = get_game_from_config(game_tag)
         let [roster, backup] = manage_roster(msg_reactions, game)
         console.log("Roster: " + roster)
         console.log("Backup " + backup)
-        msg_emb.addFields({ name: "Roster", value: roster, inline: true });
-        msg_emb.addFields({ name: "Backup", value: backup, inline: true });
+        msg_emb.fields[roster_field_id] = { name: "Roster", value: roster, inline: true }
+        msg_emb.fields[backup_field_id] = { name: "Backup", value: backup, inline: true }
         reaction.message.edit(msg_emb);
     }
 }
