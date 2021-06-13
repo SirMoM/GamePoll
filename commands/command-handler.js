@@ -11,7 +11,11 @@ module.exports = async function(message) {
     const serverID = process.env.SERVERID;
     const channelID = process.env.CHANNELID;
 
-    if (message.guild === null || (message.guild.id === serverID && message.channel.id === channelID)) {
+    let isBot = message.author.bot == true
+    let isDM = message.guild === null
+    let isServerAndChannel = () => { return (message.guild.id === serverID && message.channel.id === channelID) }
+
+    if (!isBot && (isDM || isServerAndChannel)) {
         let msgContent = message.content
         let tokens
         if (!msgContent.match('".*"')) {

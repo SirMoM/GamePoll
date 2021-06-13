@@ -2,12 +2,13 @@ let emb = require('./discord-emb.js')
 
 
 module.exports = function(message, args) {
-    if (args[0] === "--help") {
+    if (args[0] === "--help" || args.length == 0 || args.length > 2) {
         let gp_help =
             "**usage: !gp <time> <game_tag>**\n" +
             "\t Creates a message with a game poll and reactions!\n" +
             "\t The arguments are:\n" +
-            `\t\t time\t\t\t  The time when you want to play the game. Examples: 21:00, now\n` +
+            `\t\t time\t\t The time when you want to play the game. Examples: 21:00, now\n` +
+            `\t\t \t\t\t\t The time can be escaped with "". Example: "Next Week"` +
             `\t\t game_tag\tThe tag that specifies who gehts notified. Examples: ${message.author}\n~\n` +
             "**usage: !gp --help**\n\tShows the help for the !gp command\n~";
         return message.channel.send(gp_help);
