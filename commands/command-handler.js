@@ -22,6 +22,10 @@ module.exports = async function(message) {
             tokens = msgContent.split(' ');
         } else {
             tokens = generateTokens(msgContent)
+            if (!tokens) {
+                console.log("Could not parse msg")
+                return
+            }
         }
 
         let command = tokens.shift();
@@ -45,9 +49,12 @@ module.exports = async function(message) {
 }
 
 function generateTokens(msgContent) {
-    let regex = RegExp("(!\\w+) (\".*\"|\\w) (.+)", "i")
+    let regex = RegExp("^(!\\w+) (\".*\"|\\w) (.+)$", "i")
 
     let matches = msgContent.match(regex)
+    if (!matches) {
+        return null
+    }
     console.log("Regex result " + matches)
     matches.shift() // remove input
     let tokens = []
