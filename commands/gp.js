@@ -2,7 +2,7 @@ let emb = require('./discord-emb.js')
 
 
 module.exports = function(message, args) {
-    if (args[0] === "--help" || args.length == 0 || args.length > 2) {
+    if (args[0] === "--help" || args.length < 2) {
         let gp_help =
             "**usage: !gp <time> <game_tag>**\n" +
             "\t Creates a message with a game poll and reactions!\n" +
@@ -12,7 +12,7 @@ module.exports = function(message, args) {
             `\t\t game_tag\tThe tag that specifies who gehts notified. Examples: ${message.author}\n~\n` +
             "**usage: !gp --help**\n\tShows the help for the !gp command\n~";
         return message.channel.send(gp_help);
-    } else if (args.length === 2) {
+    } else if (args.length >= 2) {
         let msg_emb = emb(args[0], args[1]);
         message.channel.send(msg_emb).then((sent) => {
             sent.react("✅").then(() => sent.react("🅱️"));

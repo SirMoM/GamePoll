@@ -3,7 +3,7 @@ let emb = require('./discord-emb.js')
 const poems = require("./poem.json")
 
 module.exports = function(message, args) {
-    if (args[0] === "--help" || args.length == 0 || args.length > 2) {
+    if (args[0] === "--help" || args.length < 2) {
         let gpg_help =
             "**usage: !gpg <time> <game_tag>**\n" +
             "\t Creates a message with a game poll and reactions!\n" +
@@ -14,7 +14,7 @@ module.exports = function(message, args) {
             `\t\t game_tag\tThe tag that specifies who gehts notified. Examples: ${message.author}\n~\n` +
             "**usage: !gpg --help**\n\tShows the help for the !gpg command\n~";
         return message.channel.send(gpg_help);
-    } else if (args.length === 2) {
+    } else if (args.length >= 2) {
         let msg_emb = emb(args[0], args[1]);
         msg_emb.addField("Gedicht", poems[Math.floor(Math.random() * poems.length)])
         message.channel.send(msg_emb).then((sent) => {
