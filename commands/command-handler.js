@@ -3,9 +3,10 @@ const prefix = "!";
 const gp = require('./gp.js');
 const gpp = require('./gpp.js');
 const gpg = require('./gpg.js');
+const gpk = require('./gpk.js')
 
 
-const commands = { gp, gpp, gpg };
+const commands = { gp, gpp, gpg, gpk };
 
 module.exports = async function(message) {
     const serverID = process.env.SERVERID;
@@ -35,6 +36,8 @@ module.exports = async function(message) {
             console.log("Args: " + tokens)
 
             if (commands.hasOwnProperty(command)) {
+                if (command === "gpk")
+                    message.delete().catch(console.error);
                 commands[command](message, tokens);
             } else if (command === "gphelp") {
                 for (func_idx in commands) {
