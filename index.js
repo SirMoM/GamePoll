@@ -63,7 +63,7 @@ async function edit_emb(reaction, user) {
         console.log("Backup " + backup)
         msg_emb.fields[roster_field_id] = { name: "Roster", value: roster, inline: true }
         msg_emb.fields[backup_field_id] = { name: "Backup", value: backup, inline: true }
-        msg_emb.setFooter("MN33 ist ein Arsch!")
+        msg_emb.setFooter(user.username + " ist ein Arsch!")
         reaction.message.edit(msg_emb);
     }
 }
