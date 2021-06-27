@@ -36,7 +36,7 @@ module.exports = async function(message) {
             console.log("Args: " + tokens)
 
             if (commands.hasOwnProperty(command)) {
-                if (command === "gpk")
+                if (command === "gpk" && !isDM)
                     message.delete().catch(console.error);
                 commands[command](message, tokens);
             } else if (command === "gphelp") {
