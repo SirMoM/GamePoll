@@ -48,9 +48,9 @@ async function edit_emb(reaction, user) {
         let backup_field_id = -1
 
         msg_emb.fields.forEach(field => {
-            if (field.name === 'Roster') {
+            if (field.name.includes('Roster')) {
                 roster_field_id = msg_emb.fields.indexOf(field)
-            } else if (field.name === 'Backup') {
+            } else if (field.name.includes('Backup')) {
                 backup_field_id = msg_emb.fields.indexOf(field)
             }
 
