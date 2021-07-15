@@ -1,5 +1,5 @@
 let emb = require('./discord-emb.js')
-let past_messages = require("../past_messages.json")
+const { create_past_messages } = require("../db")
 
 module.exports = function(message, args) {
     if (args[0] === "--help" || args.length < 2) {
@@ -17,12 +17,7 @@ module.exports = function(message, args) {
         let msg_emb = emb(args[0], args[1]);
         message.channel.send(msg_emb).then((sent) => {
             sent.react("✅").then(() => sent.react("🅱️"));
-            past_messages.push(sent.id)
-            let json = JSON.stringify(past_messages)
-            var fs = require('fs');
-            fs.writeFile("./past_messages.json", json, 'utf8', (callback) => {
-                if (callback) throw callback;
-            });
+            create_past_messages(sent.id, 72)
         });
 
     }

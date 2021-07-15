@@ -60,19 +60,3 @@ paths:
           content:
             plain/text:
               example: "Added 1234 msgId"
-    delete:
-      tags:
-        - past_messages
-      summary: Remove an id
-      parameters:
-        - in: path
-          required: true
-          name: msgId
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: The added past message
-          content:
-            plain/text:
-              example: "Added 1234 msgId"

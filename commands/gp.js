@@ -1,4 +1,5 @@
 let emb = require('./discord-emb.js')
+const { create_past_messages } = require("../db")
 
 
 module.exports = function(message, args) {
@@ -16,6 +17,7 @@ module.exports = function(message, args) {
         let msg_emb = emb(args[0], args[1]);
         message.channel.send(msg_emb).then((sent) => {
             sent.react("✅").then(() => sent.react("🅱️"));
+            create_past_messages(sent.id, 24)
         });
     }
 }

@@ -1,4 +1,6 @@
-let emb = require('./discord-emb.js')
+const emb = require('./discord-emb.js')
+const { create_past_messages } = require("../db")
+
 
 const poems = require("./poem.json")
 
@@ -19,6 +21,7 @@ module.exports = function(message, args) {
         msg_emb.addField("Gedicht", poems[Math.floor(Math.random() * poems.length)])
         message.channel.send(msg_emb).then((sent) => {
             sent.react("✅").then(() => sent.react("🅱️"));
+            create_past_messages(sent.id, 24)
         });
     }
 }
