@@ -9,7 +9,7 @@ module.exports = function emb(_time, _game) {
     if (regExResult != null) {
         game_tag = regExResult[1];
     }
-    for (game_key in config.games) {
+    for (const game_key in config.games) {
         const g = config.games[game_key];
         if (g.tag === game_tag) {
             game = g;
