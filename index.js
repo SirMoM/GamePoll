@@ -93,12 +93,16 @@ async function edit_emb(reaction, user) {
 
         const [game_tag] = msg_emb.description.split('\n').slice(-1);
         const game = get_game_from_config(game_tag);
-        const [roster, backup] = await manage_roster(msg_reactions, game);
+        const [roster, backup, troll] = await manage_roster(msg_reactions, game);
         console.log('Roster: ' + roster);
         console.log('Backup ' + backup);
         msg_emb.fields[roster_field_id] = { name: 'Roster', value: roster, inline: true };
         msg_emb.fields[backup_field_id] = { name: 'Backup', value: backup, inline: true };
-        msg_emb.setFooter(user.username + ' ist ein Arsch!');
+        msg_emb.setFooter('');
+        if (troll != null) {
+            const troll_user = await user.client.users.fetch(troll).catch(console.error);
+            msg_emb.setFooter(troll_user + ' ist ein Arsch!');
+        }
         reaction.message.edit(msg_emb);
     }
 }
@@ -123,6 +127,7 @@ async function load_messages() {
 async function manage_roster(msg_reactions, game) {
     let roster = '';
     let backup = '';
+    let troll = null;
     let count = 0;
     const users = await msg_reactions.resolve('✅').users.fetch();
     users.forEach(item => {
@@ -131,6 +136,7 @@ async function manage_roster(msg_reactions, game) {
             console.log('Roster size ' + game['roster-size'] + ' players ' + count + ' will be added to backup ' + addToBackup);
             if (addToBackup) {
                 backup += '<@' + item.id + '>\n';
+                troll = item.id;
             } else {
                 roster += '<@' + item.id + '>\n';
             }
@@ -151,7 +157,7 @@ async function manage_roster(msg_reactions, game) {
         backup += '...';
     }
 
-    return [roster, backup];
+    return [roster, backup, troll];
 }
 
 function get_game_from_config(game_tag) {
