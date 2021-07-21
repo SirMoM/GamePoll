@@ -101,7 +101,7 @@ async function edit_emb(reaction, user) {
         msg_emb.setFooter('');
         if (troll != null) {
             const troll_user = await user.client.users.fetch(troll).catch(console.error);
-            msg_emb.setFooter(troll_user + ' ist ein Arsch!');
+            msg_emb.setFooter(troll_user.username + ' ist ein Arsch!');
         }
         reaction.message.edit(msg_emb);
     }
