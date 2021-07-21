@@ -21,7 +21,9 @@ module.exports = function(message, args) {
         msg_emb.addField('Gedicht', poems[Math.floor(Math.random() * poems.length)]);
         message.channel.send(msg_emb).then((sent) => {
             sent.react('✅').then(() => sent.react('🅱️'));
-            create_past_messages(sent.id, 24);
+            if (message.guild !== null) {
+                create_past_messages(sent.id, 24);
+            }
         });
     }
 };

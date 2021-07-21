@@ -17,7 +17,9 @@ module.exports = function(message, args) {
         const msg_emb = emb(args[0], args[1]);
         message.channel.send(msg_emb).then((sent) => {
             sent.react('✅').then(() => sent.react('🅱️'));
-            create_past_messages(sent.id, 72);
+            if (message.guild !== null) {
+                create_past_messages(sent.id, 72);
+            }
         });
 
     }
