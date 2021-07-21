@@ -129,8 +129,8 @@ async function manage_roster(msg_reactions, game) {
     let backup = '';
     let troll = null;
     let count = 0;
-    const users = await msg_reactions.resolve('✅').users.fetch();
-    users.forEach(item => {
+    const users_roster = await msg_reactions.resolve('✅').users.fetch();
+    users_roster.forEach(item => {
         if (item.id != BOT_ID) {
             const addToBackup = game['roster-size'] >= 0 && count >= game['roster-size'];
             console.log('Roster size ' + game['roster-size'] + ' players ' + count + ' will be added to backup ' + addToBackup);
@@ -144,9 +144,11 @@ async function manage_roster(msg_reactions, game) {
         }
     });
 
-    msg_reactions.resolve('🅱️').users.cache.forEach(item => {
+    const users_backup = await msg_reactions.resolve('🅱️').users.fetch();
+    users_backup.forEach(item => {
         if (item.id != BOT_ID) {
             backup += '<@' + item.id + '>\n';
+            troll = item.id;
         }
     });
 
