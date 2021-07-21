@@ -93,7 +93,7 @@ async function edit_emb(reaction, user) {
 
         const [game_tag] = msg_emb.description.split('\n').slice(-1);
         const game = get_game_from_config(game_tag);
-        const [roster, backup] = manage_roster(msg_reactions, game);
+        const [roster, backup] = await manage_roster(msg_reactions, game);
         console.log('Roster: ' + roster);
         console.log('Backup ' + backup);
         msg_emb.fields[roster_field_id] = { name: 'Roster', value: roster, inline: true };
@@ -108,7 +108,6 @@ async function load_messages() {
     const past_messages = await db.get_past_messages();
     for (const msg_idx in past_messages) {
         const ID = past_messages[msg_idx].messageid;
-
         const channel = await client.channels.fetch(process.env.CHANNELID, true);
         const message = await channel.messages.fetch(ID);
         if (message !== null && typeof message == 'object') {
@@ -118,12 +117,12 @@ async function load_messages() {
         console.log('Added message: ' + ID + ' from file!');
     }
 }
-
-function manage_roster(msg_reactions, game) {
+async function manage_roster(msg_reactions, game) {
     let roster = '';
     let backup = '';
     let count = 0;
-    msg_reactions.resolve('✅').users.cache.forEach(item => {
+    const users = await msg_reactions.resolve('✅').users.fetch();
+    users.forEach(item => {
         if (item.id != BOT_ID) {
             const addToBackup = game['roster-size'] >= 0 && count >= game['roster-size'];
             console.log('Roster size ' + game['roster-size'] + ' players ' + count + ' will be added to backup ' + addToBackup);
