@@ -43,6 +43,6 @@ async function create_past_messages(msg_id, lifetime_in_h) {
     const querry = `INSERT INTO past_messages VALUES(${msg_id}, NOW(), ${lifetime_in_h})`;
     console.log(querry);
     dbclient.query(querry)
-        .then((result) => { console.log(result); })
+        .then(() => { console.log('Saved msg: ' + msg_id); })
         .catch((err) => { console.error(err); });
 }

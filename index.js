@@ -118,7 +118,11 @@ async function load_messages() {
         if (message !== null && typeof message == 'object') {
             message.client.on('messageReactionAdd', edit_emb);
             message.client.on('messageReactionRemove', edit_emb);
-            const game_tag = message.embeds[0].description.match(game_tag_regex)[1];
+            const regEx_result = message.embeds[0].description.match(game_tag_regex);
+            let game_tag = null;
+            if(regEx_result) {
+                game_tag = regEx_result[1];
+            }
             manage_roster(message.reactions, get_game_from_config(game_tag));
         }
         console.log('Added message: ' + ID + ' from file!');
