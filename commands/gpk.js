@@ -1,6 +1,5 @@
 const Discord = require('discord.js');
 const config = require('./config.json');
-const { create_past_messages } = require('../db');
 const tagRegEx = RegExp('<@&([0-9]*)>');
 
 
@@ -20,9 +19,6 @@ module.exports = function(message, args) {
         const msg_emb = comp_emb(args[0], args[1]);
         message.channel.send(msg_emb).then((sent) => {
             sent.react('✅').then(() => sent.react('🅱️'));
-            if (message.guild !== null) {
-                create_past_messages(sent.id, 24);
-            }
         });
     }
 };
