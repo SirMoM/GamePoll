@@ -57,6 +57,9 @@ client.on('messageReactionAdd', edit_emb);
 client.on('message', CommandHandler);
 
 
+const rosterString = 'Roster';
+const backupString = 'Backup';
+
 // =============== Functions ======================
 async function edit_emb(reaction, user) {
     // When we receive a reaction we check if the reaction is partial or not
@@ -83,9 +86,9 @@ async function edit_emb(reaction, user) {
         let backup_field_id = -1;
 
         msg_emb.fields.forEach(field => {
-            if (field.name.includes('Roster')) {
+            if (field.name.includes(rosterString)) {
                 roster_field_id = msg_emb.fields.indexOf(field);
-            } else if (field.name.includes('Backup')) {
+            } else if (field.name.includes(backupString)) {
                 backup_field_id = msg_emb.fields.indexOf(field);
             }
 
@@ -95,9 +98,9 @@ async function edit_emb(reaction, user) {
         const game = get_game_from_config(game_tag);
         const [roster, backup, troll] = await manage_roster(msg_reactions, game);
         console.log('Roster: ' + roster);
-        console.log('Backup ' + backup);
-        msg_emb.fields[roster_field_id] = { name: 'Roster', value: roster, inline: true };
-        msg_emb.fields[backup_field_id] = { name: 'Backup', value: backup, inline: true };
+        console.log('Backup:' + backup);
+        msg_emb.fields[roster_field_id] = { name: rosterString, value: roster, inline: true };
+        msg_emb.fields[backup_field_id] = { name: backupString, value: backup, inline: true };
         msg_emb.setFooter('');
         if (troll != null) {
             const troll_user = await user.client.users.fetch(troll).catch(console.error);
@@ -132,7 +135,7 @@ async function manage_roster(msg_reactions, game) {
     let roster = '';
     let backup = '';
     let troll = null;
-    let count = 0;
+    let count = 1;
     const users_roster = await msg_reactions.resolve('✅').users.fetch();
     users_roster.forEach(item => {
         if (item.id != BOT_ID) {
