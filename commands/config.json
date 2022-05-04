@@ -67,6 +67,19 @@
             ],
             "roster-size": 5,
             "color": "#FF1493"
+        },
+        "Catan": {
+            "name": "Catan Universe",
+            "tag": "971327786524504104",
+            "thumbnails": [
+                "https://catanuniverse.com/wp-content/themes/catan-theme/img/catan-logo.png",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3lXp2dGNENEwnFoHiDUa3a9sEWia5LN9hwg&usqp=CAU",
+                "https://www.catan.de/sites/prod/files/2021-05/CU_Icon.png",
+                "https://www.weingut-mohr.de/presse.php?data/articles/images/famneherlorch.jpg",
+                "https://www.riesling.de/media/1403767905_collage_web.jpg"
+            ],
+            "roster-size": 4,
+            "color": "#9C6B30"
         }
     },
     "default-emb": {
