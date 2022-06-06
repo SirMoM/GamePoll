@@ -1,12 +1,23 @@
 {
-    "generic-game-poll": {
+    "generalConfig": {
         "title": "Gayming-Anfragen",
-        "time-text": "So meine Freunde **{time}** ist der Call!",
-        "additional-text": "**Bitte reagiert mit einem Emoji sonst kann es sein, dass ihr nicht mitmachen könnt, da ggf. sonst kein Platz mehr frei ist**",
-        "explain-emojis": "✅ = bin dabei!\n🅱️ = ich weiß nicht (Backup)!"
+        "timeText": "So meine Freunde **{time}** ist der Call!",
+        "additionalText": "**Bitte reagiert mit einem Emoji sonst kann es sein, dass ihr nicht mitmachen könnt, da ggf. sonst kein Platz mehr frei ist**",
+        "explainEmojisText": "✅ = bin dabei!\n🅱️ = ich weiß nicht (Backup)!"
     },
-    "games": {
-        "CSGO": {
+    "defaultGameConfig": {
+        "name": "Spiele",
+        "thumbnails": [
+            "https://media1.tenor.com/images/fc622dcea2ec86828f89b3a9e4ae07e0/tenor.gif",
+            "https://wallpapercave.com/wp/wp5498323.png",
+            "https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/a/a9/Unicorns_Of_Lovelogo_square.png/revision/latest/scale-to-width-down/307?cb=20200516013946",
+            "https://cdn0.gamesports.net/edb_team_logos/21000/21801.png?1582027029"
+        ],
+        "rosterSize": -1,
+        "color": "#5599ff"
+    },
+    "gamesConfig": [
+        {
             "name": "Gegenschlag Globale Offensive",
             "tag": "714530296296505344",
             "thumbnails": [
@@ -15,10 +26,10 @@
                 "https://i.imgur.com/OVRkXCM.jpg",
                 "https://i.redd.it/ca2kalp8sks41.jpg"
             ],
-            "roster-size": 5,
+            "rosterSize": 5,
             "color": "#FF1493"
         },
-        "LOL": {
+        {
             "name": "Salz",
             "tag": "714530690988769281",
             "thumbnails": [
@@ -26,28 +37,28 @@
                 "https://opgg-static.akamaized.net/images/medals/iron_1.png",
                 "https://pbs.twimg.com/media/D7wrK9pXoAEKfxh.png"
             ],
-            "roster-size": 5,
+            "rosterSize": 5,
             "color": "#FFFFFF"
         },
-        "CIV": {
+        {
             "name": "Lebenszeit war einmal",
             "tag": "714538595725213897",
             "thumbnails": [
                 "https://i.imgur.com/3OLTFVq.jpg"
             ],
-            "roster-size": -1,
+            "rosterSize": -1,
             "color": "#7CFC00"
         },
-        "SoT": {
+        {
             "name": "Sea of ThEEEEEfs",
             "tag": "803920848872144896",
             "thumbnails": [
                 "https://i.pinimg.com/originals/a4/f1/f3/a4f1f3572c496388dc97b925d4c1508f.jpg"
             ],
-            "roster-size": 4,
+            "rosterSize": 4,
             "color": "#7CFCF0"
         },
-        "OW": {
+        {
             "name": "Überwachen",
             "tag": "714508396820168837",
             "thumbnails": [
@@ -56,19 +67,19 @@
                 "https://imgur.com/gallery/9qDVW",
                 "https://pbs.twimg.com/media/CnbIQN5UsAA55kV?format=jpg&name=360x360"
             ],
-            "roster-size": 6,
+            "rosterSize": 6,
             "color": "#8B5A2B"
         },
-        "VALO": {
+        {
             "name": "Valorant",
             "tag": "841747666357452820",
             "thumbnails": [
                 "https://www.tz.de/bilder/2020/04/22/13697885/1767528527-valorant-beta-keys-lange-dauert-twitch-drop-kommt-2uQIjHSgYmef.jpg"
             ],
-            "roster-size": 5,
+            "rosterSize": 5,
             "color": "#FF1493"
         },
-        "Catan": {
+        {
             "name": "Catan Universe",
             "tag": "971327786524504104",
             "thumbnails": [
@@ -78,19 +89,8 @@
                 "https://www.weingut-mohr.de/presse.php?data/articles/images/famneherlorch.jpg",
                 "https://www.riesling.de/media/1403767905_collage_web.jpg"
             ],
-            "roster-size": 4,
+            "rosterSize": 4,
             "color": "#9C6B30"
         }
-    },
-    "default-emb": {
-        "name": "Spiele",
-        "thumbnails": [
-            "https://media1.tenor.com/images/fc622dcea2ec86828f89b3a9e4ae07e0/tenor.gif",
-            "https://wallpapercave.com/wp/wp5498323.png",
-            "https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/a/a9/Unicorns_Of_Lovelogo_square.png/revision/latest/scale-to-width-down/307?cb=20200516013946",
-            "https://cdn0.gamesports.net/edb_team_logos/21000/21801.png?1582027029"
-        ],
-        "roster-size": -1,
-        "color": "#5599ff"
-    }
+    ]
 }

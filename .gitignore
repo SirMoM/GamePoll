@@ -1,4 +1,7 @@
 node_modules
+dist
+Logs
 .env
 .DS_Store
 .vscode
+.idea
