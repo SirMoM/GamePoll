@@ -4,6 +4,7 @@ const gp = require('./gp.js');
 const gpp = require('./gpp.js');
 const gpg = require('./gpg.js');
 const gpk = require('./gpk.js');
+const gpb = require('./gpb.js')
 
 const commands = { gp, gpp, gpg, gpk };
 

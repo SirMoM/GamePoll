@@ -131,6 +131,7 @@ async function load_messages() {
         console.log('Added message: ' + ID + ' from file!');
     }
 }
+// TODO unit tests for this shit
 async function manage_roster(msg_reactions, game) {
     let roster = '';
     let backup = '';
