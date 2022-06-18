@@ -1,17 +1,6 @@
-import {
-    BaseCommandInteraction,
-    ButtonInteraction,
-    Client,
-    EmbedField,
-    Interaction,
-    User,
-} from "discord.js";
+import { BaseCommandInteraction, ButtonInteraction, Client, EmbedField, Interaction, User } from "discord.js";
 import { Command, Commands } from "./command/Command";
-import {
-    backupButtonCustomId,
-    imInButtonCustomId,
-    manageRoster,
-} from "./command/GamePoll";
+import { backupButtonCustomId, imInButtonCustomId, manageRoster } from "./command/GamePoll";
 import { gamesConfig } from "./config/GamesConfig";
 import { logger as LOG } from "./logging/Logger";
 
@@ -48,16 +37,8 @@ const handleSlashCommand = async (
     slashCommand.run(client, interaction);
 };
 
-async function handleButtonInteraction(
-    client: Client,
-    interaction: ButtonInteraction
-) {
-    if (
-        !(
-            interaction.customId === imInButtonCustomId ||
-            interaction.customId === backupButtonCustomId
-        )
-    ) {
+async function handleButtonInteraction(client: Client, interaction: ButtonInteraction) {
+    if (!(interaction.customId === imInButtonCustomId || interaction.customId === backupButtonCustomId)) {
         interaction
             .reply({ ephemeral: true, content: "An error has occurred" })
             .catch((error) => {

@@ -4,8 +4,8 @@
     "description": "A discord bot for polling/finding people to play with.",
     "main": "index.js",
     "scripts": {
-        "start": "node dist/index.js",
-        "run": "npx tsc && node dist/index.js",
+        "run": "node dist/index.js",
+        "start": "npx tsc && node dist/index.js",
         "ts-node":  "npx ts-node src/index.ts",
         "lint": "npx eslint . --ignore-pattern node_modules/ --fix"
     },

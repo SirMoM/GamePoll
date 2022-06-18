@@ -46,4 +46,3 @@ if (process.env.NODE_ENV !== "production") {
     consoleLogger.format = myColorFormat
     logger.add(consoleLogger);
 }
-

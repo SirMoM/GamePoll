@@ -13,7 +13,7 @@ function exitHandler(options: { cleanup?: boolean, exit: boolean }, exitCode: nu
     console.log(exitCode )
     console.log(options )
     // Db.close();
-    if (options.cleanup) { 
+    if (options.cleanup) {
         LOG.info("Clean up application");
 
         LOG.info("Closed database connection");
@@ -22,7 +22,7 @@ function exitHandler(options: { cleanup?: boolean, exit: boolean }, exitCode: nu
     if (exitCode !== 2) {
         LOG.warn(`EXIT CODE: ${exitCode}`);
     }
-    
+
     if (options.exit) {
         process.exit();
     }
