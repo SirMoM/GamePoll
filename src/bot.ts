@@ -27,15 +27,13 @@ function loginBot(): Client {
             });
 
         if (client.application) {
-            client.application.commands.set(Commands, guildId)
-                .catch((error: Error) => {
-                    LOG.error(error);
-                });
+            client.application.commands.set(Commands, guildId).catch((error: Error) => {
+                LOG.error(error);
+            });
         }
     });
     return client;
 }
-
 
 export function botLoginAndSetup(): Client {
     const bot = loginBot();

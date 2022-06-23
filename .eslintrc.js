@@ -1,12 +1,12 @@
 module.exports = {
   root: true,
-  parser: '@typescript-eslint/parser',
+  parser: "@typescript-eslint/parser",
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: ['./tsconfig.json'],
+    project: ["./tsconfig.json"]
   },
   plugins: [
-    '@typescript-eslint',
+    "@typescript-eslint"
   ],
   rules: {
     "max-len": [
@@ -15,16 +15,16 @@ module.exports = {
         "ignoreComments": true,
         "ignoreStrings": true,
         "ignoreTemplateLiterals": true,
-         "ignorePattern": "^import \\{\\n?(\\s+\\w+,\\n?)*|.*\\} from .*$"
-        }
-      ]
+        "ignorePattern": "^import \\{\\n?(\\s+\\w+,\\n?)*|.*\\} from .*$"
+      }
+    ]
   },
   extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    'prettier',
-    "plugin:@typescript-eslint/strict",
-  ],
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "prettier",
+    "plugin:@typescript-eslint/strict"
+  ]
 
 };

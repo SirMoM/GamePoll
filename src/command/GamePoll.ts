@@ -9,6 +9,8 @@ import { Command } from "./Command";
 
 const poems: string[] = poemJson;
 
+const fakeRoster = "Ｂａｃｋｕｐ";
+
 const imInText = "Bin dabei";
 
 export const imInButtonCustomId = "imIn";
@@ -16,6 +18,7 @@ export const backupButtonCustomId = "backup";
 
 const opPoem = "poem";
 const opShort = "short";
+const opBackupOnly = "backupOnly";
 // const opPersistence = "persistence";
 
 export const GamePoll: Command = {
@@ -47,6 +50,13 @@ export const GamePoll: Command = {
             name: opShort,
             description: "Use the compact from of the poll (default: false)",
             required: false
+        },
+        {
+            type: "BOOLEAN",
+            name: opBackupOnly,
+            description:
+                "Use the backup-only from of the poll (default: false)",
+            required: false
         }
         // {
         //     type: "NUMBER",
@@ -58,8 +68,6 @@ export const GamePoll: Command = {
     ],
 
     run: async (client: Client, interaction: BaseCommandInteraction) => {
-        const components = createRosterAndBackupButtons();
-
         // Option parsing
         const role = interaction.options.get("role", true).role!;
         const time = interaction.options.get("time", true).value!.toString();
@@ -67,12 +75,13 @@ export const GamePoll: Command = {
         // If we dont get a role return // FIXME: Error handling
         if (!(role instanceof Role)) return;
 
-        const poem: boolean = (interaction.options.get(opPoem)?.value ?? false) as boolean ;
+        const poem: boolean = (interaction.options.get(opPoem)?.value ?? false) as boolean;
         const short: boolean = (interaction.options.get(opShort)?.value ?? false) as boolean;
+        const backupOnly: boolean = (interaction.options.get(opBackupOnly)?.value ?? false) as boolean;
 
         const len = Object.keys(poems).length;
 
-        LOG.info(`Role: ${role.name} Time: ${time} Poem: ${poem.toString()} ${len} Short ${short.toString()}` )
+        LOG.info(`Role: ${role.name} Time: ${time} Poem: ${poem.toString()} ${len} Short ${short.toString()}`);
 
         let content = `${role.toString()} um ${time.toLocaleString()}!`;
 
@@ -81,25 +90,28 @@ export const GamePoll: Command = {
             content += poems[Math.floor(Math.random() * len)];
         }
 
-        const embed: MessageEmbed = createDiscordEmbed(time, role, short);
-
+        const embed: MessageEmbed = createDiscordEmbed(
+            time,
+            role,
+            short,
+            backupOnly
+        );
+        const buttons = createRosterAndBackupButtons(backupOnly);
         await interaction.followUp({
             ephemeral: false,
             content: content,
             embeds: [embed],
-            components: [components]
+            components: [buttons]
         });
     }
 };
 
-function createRosterAndBackupButtons(
-    imInLabel: string = imInText
-): MessageActionRow {
+function createRosterAndBackupButtons(backupOnly: boolean): MessageActionRow {
     return new MessageActionRow()
         .addComponents(
             new MessageButton()
                 .setCustomId(imInButtonCustomId)
-                .setLabel(imInLabel)
+                .setLabel(backupOnly ? imInText : fakeRoster) // Very elegant but not so easy to read
                 .setStyle("SUCCESS")
         )
         .addComponents(
@@ -113,21 +125,33 @@ function createRosterAndBackupButtons(
 function createDiscordEmbed(
     time: string,
     role: Role,
-    short: boolean
+    short: boolean,
+    backupOnly: boolean
 ): MessageEmbed {
     const gameConfig: GameConfig = getGameConfigFromTag(role.id);
 
     const messageEmbed = new MessageEmbed()
         .setColor(gameConfig.color as HexColorString)
         .setTitle(gamesConfig.generalConfig.title)
-        .addFields({ name: "Roster", value: "...", inline: true })
-        .addFields({ name: "Backup", value: "...", inline: true })
         .setTimestamp()
         .setThumbnail(
             gameConfig.thumbnails[
                 Math.floor(Math.random() * gameConfig.thumbnails.length)
                 ]
         );
+
+    if (backupOnly) {
+        messageEmbed.addFields({ name: "Roster", value: "...", inline: true });
+    } else {
+        messageEmbed.addFields({
+            name: fakeRoster,
+            value: "...",
+            inline: true
+        });
+    }
+
+    messageEmbed.addFields({ name: "Backup", value: "...", inline: true });
+
     // Only add description for not short Messages
     if (!short) {
         messageEmbed.setDescription(createDiscordEmbedDiscription(time, role));
@@ -156,7 +180,9 @@ export function manageRoster(
     // TODO parse roster and Backup fields
     // TODO Calculate new roster and Backup fields
     // TODO How to remove self?
-    const rosterField = fields.find((it) => it.name === "Roster")!;
+    const rosterField = fields.find(
+        (it) => it.name === "Roster" || it.name === fakeRoster
+    )!;
     const backupField = fields.find((it) => it.name === "Backup")!;
 
     const roster: string[] = parseListOfPlayers(rosterField.value);
@@ -192,7 +218,7 @@ export function manageRoster(
     LOG.info(`Modified backup ${JSON.stringify(backup)}`);
 
     const rosterEmbedField: EmbedField = {
-        name: "Roster",
+        name: rosterField.name == fakeRoster ? fakeRoster : "Roster",
         value: writeListOfPlayers(roster),
         inline: true
     };

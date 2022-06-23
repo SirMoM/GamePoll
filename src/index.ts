@@ -1,6 +1,6 @@
-import {logger as LOG} from './logging/Logger'
-import { botLoginAndSetup } from './bot';
-import { config } from 'dotenv'
+import { logger as LOG } from "./logging/Logger";
+import { botLoginAndSetup } from "./bot";
+import { config } from "dotenv";
 
 // Load .env file and config process
 config();
@@ -43,6 +43,5 @@ process.on("SIGUSR2", exitHandler.bind(null, { exit: true }));
 
 // =============== Gracefull shutdown ======================
 
-
 // =============== Logins =================
-botLoginAndSetup()
+botLoginAndSetup();

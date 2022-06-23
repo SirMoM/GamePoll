@@ -1,4 +1,4 @@
-import { Logger, createLogger, format, transports } from "winston";
+import { createLogger, format, Logger, transports } from "winston";
 
 const { combine, timestamp, printf } = format;
 
@@ -19,22 +19,22 @@ const myColorFormat = printf(({ level, message, timestamp }): string => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    return `${timestamp} [${(color[level])}${level.toLocaleUpperCase()}${color.reset}] ${message}`;
+    return `${timestamp} [${color[level]}${level.toLocaleUpperCase()}${
+        color.reset
+    }] ${message}`;
 });
 
 export const logger: Logger = createLogger({
     level: "info",
-    format: combine(
-        timestamp({ format: "DD.MM.YYYY [-] HH:mm" }),
-        myFormat),
+    format: combine(timestamp({ format: "DD.MM.YYYY [-] HH:mm" }), myFormat),
     transports: [
         //
         // - Write all logs with importance level of `error` or less to `error.log`
         // - Write all logs with importance level of `info` or less to `combined.log`
         //
         new transports.File({ filename: "Logs/error.log", level: "error" }),
-        new transports.File({ filename: "Logs/combined.log" }),
-    ],
+        new transports.File({ filename: "Logs/combined.log" })
+    ]
 });
 
 //
@@ -42,7 +42,7 @@ export const logger: Logger = createLogger({
 // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
 //
 if (process.env.NODE_ENV !== "production") {
-    const consoleLogger = new transports.Console()
-    consoleLogger.format = myColorFormat
+    const consoleLogger = new transports.Console();
+    consoleLogger.format = myColorFormat;
     logger.add(consoleLogger);
 }

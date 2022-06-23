@@ -62,7 +62,9 @@ async function handleButtonInteraction(client: Client, interaction: ButtonIntera
     const emb = message.embeds[0];
 
     if (interaction.customId == backupButtonCustomId)
-        emb.footer = {text: `${interaction.member?.user.toString() ?? "MN33"} sucked!`}
+        emb.footer = {
+            text: `${interaction.member?.user.toString() ?? "MN33"} sucked!`
+        };
 
-        await interaction.update({ embeds: [emb] });
+    await interaction.update({ embeds: [emb] });
 }
