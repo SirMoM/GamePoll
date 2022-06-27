@@ -72,9 +72,10 @@
         },
         {
             "name": "Valorant",
-            "tag": "841747666357452820",
+            "tag": "991070470004678667",
             "thumbnails": [
-                "https://www.tz.de/bilder/2020/04/22/13697885/1767528527-valorant-beta-keys-lange-dauert-twitch-drop-kommt-2uQIjHSgYmef.jpg"
+                "https://www.tz.de/bilder/2020/04/22/13697885/1767528527-valorant-beta-keys-lange-dauert-twitch-drop-kommt-2uQIjHSgYmef.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Valorant_logo_-_pink_color_version.svg/544px-Valorant_logo_-_pink_color_version.svg.png"
             ],
             "rosterSize": 5,
             "color": "#FF1493"
