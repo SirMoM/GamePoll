@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { BaseCommandInteraction, Client, EmbedField, HexColorString, MessageActionRow, MessageButton, MessageEmbed, MessageMentions, Role, User } from "discord.js";
+import { BaseCommandInteraction, Client, EmbedField, MessageActionRow, MessageButton, MessageEmbed, MessageMentions, Role, User } from "discord.js";
 import { GameConfig, gamesConfig, getGameConfigFromTag } from "../config/GamesConfig";
 import * as poemJson from "../config/poem.json";
 import { logger as LOG } from "../logging/Logger";
@@ -18,7 +18,7 @@ export const backupButtonCustomId = "backup";
 
 const opPoem = "poem";
 const opShort = "short";
-const opBackupOnly = "backupOnly";
+const opBackupOnly = "backup-only";
 // const opPersistence = "persistence";
 
 export const GamePoll: Command = {
@@ -54,8 +54,7 @@ export const GamePoll: Command = {
         {
             type: "BOOLEAN",
             name: opBackupOnly,
-            description:
-                "Use the backup-only from of the poll (default: false)",
+            description: "Use the backup-only from of the poll (default: false)",
             required: false
         }
         // {
@@ -81,7 +80,7 @@ export const GamePoll: Command = {
 
         const len = Object.keys(poems).length;
 
-        LOG.info(`Role: ${role.name} Time: ${time} Poem: ${poem.toString()} ${len} Short ${short.toString()}`);
+        LOG.info(`Role: ${role.name} Time: ${time} Poem: ${poem.toString()} ${len} Short ${short.toString()} BackupOnly: ${backupOnly.toString()}`);
 
         let content = `${role.toString()} um ${time.toLocaleString()}!`;
 
@@ -111,7 +110,7 @@ function createRosterAndBackupButtons(backupOnly: boolean): MessageActionRow {
         .addComponents(
             new MessageButton()
                 .setCustomId(imInButtonCustomId)
-                .setLabel(backupOnly ? imInText : fakeRoster) // Very elegant but not so easy to read
+                .setLabel(backupOnly ? fakeRoster : imInText) // Very elegant but not so easy to read
                 .setStyle("SUCCESS")
         )
         .addComponents(
@@ -140,7 +139,7 @@ function createDiscordEmbed(
                 ]
         );
 
-    if (backupOnly) {
+    if (!backupOnly) {
         messageEmbed.addFields({ name: "Roster", value: "...", inline: true });
     } else {
         messageEmbed.addFields({
@@ -168,7 +167,6 @@ function createDiscordEmbedDiscription(time: string, role: Role): string {
     ${role.toString()}`;
 }
 
-// TODO Add option for backup only
 export function manageRoster(
     customId: string,
     user: User,
@@ -177,9 +175,6 @@ export function manageRoster(
 ): EmbedField[] {
     LOG.info(`Managing roster: ${user.username} ${customId}`);
 
-    // TODO parse roster and Backup fields
-    // TODO Calculate new roster and Backup fields
-    // TODO How to remove self?
     const rosterField = fields.find(
         (it) => it.name === "Roster" || it.name === fakeRoster
     )!;
