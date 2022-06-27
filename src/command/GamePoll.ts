@@ -130,7 +130,7 @@ function createDiscordEmbed(
     const gameConfig: GameConfig = getGameConfigFromTag(role.id);
 
     const messageEmbed = new MessageEmbed()
-        .setColor(gameConfig.color as HexColorString)
+        .setColor(role.color)
         .setTitle(gamesConfig.generalConfig.title)
         .setTimestamp()
         .setThumbnail(
