@@ -212,14 +212,17 @@ export function manageRoster(
     LOG.info(`Modified roster ${JSON.stringify(roster)}`);
     LOG.info(`Modified backup ${JSON.stringify(backup)}`);
 
+    let rosterFieldName = rosterField.name == fakeRoster ? fakeRoster : "Roster";
+    rosterFieldName += `\n(${roster.length}/${game.rosterSize})`;
+
     const rosterEmbedField: EmbedField = {
-        name: rosterField.name == fakeRoster ? fakeRoster : "Roster",
+        name: rosterFieldName,
         value: writeListOfPlayers(roster),
         inline: true
     };
 
     const backupEmbedField: EmbedField = {
-        name: "Backup",
+        name: "Backup\n",
         value: writeListOfPlayers(backup),
         inline: true
     };
