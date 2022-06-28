@@ -1,7 +1,7 @@
-import { BaseCommandInteraction, ButtonInteraction, Client, EmbedField, Interaction, User } from "discord.js";
+import { BaseCommandInteraction, ButtonInteraction, Client, EmbedField, Interaction, Message, MessageMentions, User } from "discord.js";
 import { Command, Commands } from "./command/Command";
 import { backupButtonCustomId, imInButtonCustomId, manageRoster } from "./command/GamePoll";
-import { gamesConfig } from "./config/GamesConfig";
+import { getGameConfigFromTag } from "./config/GamesConfig";
 import { logger as LOG } from "./logging/Logger";
 
 export default (client: Client): void => {
@@ -39,23 +39,23 @@ const handleSlashCommand = async (
 
 async function handleButtonInteraction(client: Client, interaction: ButtonInteraction) {
     if (!(interaction.customId === imInButtonCustomId || interaction.customId === backupButtonCustomId)) {
-        interaction
-            .reply({ ephemeral: true, content: "An error has occurred" })
+        interaction.reply({ ephemeral: true, content: "An error has occurred" })
             .catch((error) => {
                 LOG.error(error);
             });
         return;
     }
 
-    const message = interaction.message;
-    interaction.member?.user;
-
-    LOG.info(interaction.client.user);
+    const message: Message = interaction.message as Message;
+    const roleAsString: string | undefined = message.content.match(MessageMentions.ROLES_PATTERN)?.pop()
+    if (roleAsString == undefined) throw Error("Could not find role in Embed content")
+    const roleID = roleAsString.substring(3, roleAsString.length-1)
+    LOG.info("Role ID from message: " + roleID)
     const fields = manageRoster(
         interaction.customId,
         interaction.member?.user as User,
         interaction.message.embeds[0].fields as EmbedField[],
-        gamesConfig.defaultGameConfig
+        getGameConfigFromTag(roleID)
     );
 
     message.embeds[0].fields = fields;

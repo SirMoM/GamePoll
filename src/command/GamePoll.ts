@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { BaseCommandInteraction, Client, EmbedField, MessageActionRow, MessageButton, MessageEmbed, MessageMentions, Role, User } from "discord.js";
+import { BaseCommandInteraction, Client, EmbedField, MessageActionRow, MessageButton, MessageEmbed, Role, User } from "discord.js";
 import { GameConfig, gamesConfig, getGameConfigFromTag } from "../config/GamesConfig";
 import * as poemJson from "../config/poem.json";
 import { logger as LOG } from "../logging/Logger";
@@ -9,7 +9,8 @@ import { Command } from "./Command";
 
 const poems: string[] = poemJson;
 
-const fakeRoster = "Ｂａｃｋｕｐ";
+const fakeRosterText = "Ｂａｃｋｕｐ";
+const rosterText = "Roster"
 
 const imInText = "Bin dabei";
 
@@ -110,7 +111,7 @@ function createRosterAndBackupButtons(backupOnly: boolean): MessageActionRow {
         .addComponents(
             new MessageButton()
                 .setCustomId(imInButtonCustomId)
-                .setLabel(backupOnly ? fakeRoster : imInText) // Very elegant but not so easy to read
+                .setLabel(backupOnly ? fakeRosterText : imInText) // Very elegant but not so easy to read
                 .setStyle("SUCCESS")
         )
         .addComponents(
@@ -128,7 +129,7 @@ function createDiscordEmbed(
     backupOnly: boolean
 ): MessageEmbed {
     const gameConfig: GameConfig = getGameConfigFromTag(role.id);
-    LOG.info(`${role.name}: ${gameConfig.name}`)
+    LOG.info(`${role.name}: ${gameConfig.name}`);
     const messageEmbed = new MessageEmbed()
         .setColor(role.color)
         .setTitle(gamesConfig.generalConfig.title)
@@ -143,7 +144,7 @@ function createDiscordEmbed(
         messageEmbed.addFields({ name: "Roster", value: "...", inline: true });
     } else {
         messageEmbed.addFields({
-            name: fakeRoster,
+            name: fakeRosterText,
             value: "...",
             inline: true
         });
@@ -175,8 +176,8 @@ export function manageRoster(
 ): EmbedField[] {
     LOG.info(`Managing roster: ${user.username} ${customId}`);
 
-    const rosterField = fields[0] //fields.find((it) => it.name === "Roster" || it.name === fakeRoster)!;
-    const backupField = fields[1] //fields.find((it) => it.name === "Backup")!;
+    const rosterField = fields[0]; //fields.find((it) => it.name === "Roster" || it.name === fakeRoster)!;
+    const backupField = fields[1]; //fields.find((it) => it.name === "Backup")!;
 
     const roster: string[] = parseListOfPlayers(rosterField.value);
     const backup: string[] = parseListOfPlayers(backupField.value);
@@ -210,8 +211,8 @@ export function manageRoster(
     LOG.info(`Modified roster ${JSON.stringify(roster)}`);
     LOG.info(`Modified backup ${JSON.stringify(backup)}`);
 
-    let rosterFieldName = rosterField.name == fakeRoster ? fakeRoster : "Roster";
-    rosterFieldName += `  (${roster.length}/${(game.rosterSize == -1) ? "∞" : game.rosterSize})`;
+    let rosterFieldName = (rosterField.name.startsWith(rosterText)) ? rosterText : fakeRosterText;
+    rosterFieldName += ` (${roster.length}/${(game.rosterSize == -1) ? "∞" : game.rosterSize})`;
 
     const rosterEmbedField: EmbedField = {
         name: rosterFieldName,
