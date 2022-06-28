@@ -128,7 +128,7 @@ function createDiscordEmbed(
     backupOnly: boolean
 ): MessageEmbed {
     const gameConfig: GameConfig = getGameConfigFromTag(role.id);
-
+    LOG.info(`${role.name}: ${gameConfig.name}`)
     const messageEmbed = new MessageEmbed()
         .setColor(role.color)
         .setTitle(gamesConfig.generalConfig.title)
