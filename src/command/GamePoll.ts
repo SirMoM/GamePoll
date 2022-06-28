@@ -175,10 +175,8 @@ export function manageRoster(
 ): EmbedField[] {
     LOG.info(`Managing roster: ${user.username} ${customId}`);
 
-    const rosterField = fields.find(
-        (it) => it.name === "Roster" || it.name === fakeRoster
-    )!;
-    const backupField = fields.find((it) => it.name === "Backup")!;
+    const rosterField = fields[0] //fields.find((it) => it.name === "Roster" || it.name === fakeRoster)!;
+    const backupField = fields[1] //fields.find((it) => it.name === "Backup")!;
 
     const roster: string[] = parseListOfPlayers(rosterField.value);
     const backup: string[] = parseListOfPlayers(backupField.value);
@@ -213,7 +211,7 @@ export function manageRoster(
     LOG.info(`Modified backup ${JSON.stringify(backup)}`);
 
     let rosterFieldName = rosterField.name == fakeRoster ? fakeRoster : "Roster";
-    rosterFieldName += `\n(${roster.length}/${game.rosterSize})`;
+    rosterFieldName += `  (${roster.length}/${(game.rosterSize == -1) ? "∞" : game.rosterSize})`;
 
     const rosterEmbedField: EmbedField = {
         name: rosterFieldName,
@@ -222,7 +220,7 @@ export function manageRoster(
     };
 
     const backupEmbedField: EmbedField = {
-        name: "Backup\n",
+        name: "Backup",
         value: writeListOfPlayers(backup),
         inline: true
     };
