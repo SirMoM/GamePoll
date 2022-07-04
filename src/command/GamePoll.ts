@@ -2,15 +2,18 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { BaseCommandInteraction, Client, EmbedField, MessageActionRow, MessageButton, MessageEmbed, Role, User } from "discord.js";
+import { Options, textSync } from "figlet";
 import { GameConfig, gamesConfig, getGameConfigFromTag } from "../config/GamesConfig";
 import * as poemJson from "../config/poem.json";
+import * as quotesJson from "../config/quotes.json";
 import { logger as LOG } from "../logging/Logger";
 import { Command } from "./Command";
 
 const poems: string[] = poemJson;
+const quotes: string[] = quotesJson;
 
 const fakeRosterText = "Ｂａｃｋｕｐ";
-const rosterText = "Roster"
+const rosterText = "Roster";
 
 const imInText = "Bin dabei";
 
@@ -20,6 +23,8 @@ export const backupButtonCustomId = "backup";
 const opPoem = "poem";
 const opShort = "short";
 const opBackupOnly = "backup-only";
+const opLargeTime = "large-time"
+const opLin = "lin";
 // const opPersistence = "persistence";
 
 export const GamePoll: Command = {
@@ -57,7 +62,20 @@ export const GamePoll: Command = {
             name: opBackupOnly,
             description: "Use the backup-only from of the poll (default: false)",
             required: false
-        }
+        },
+        {
+            type: "BOOLEAN",
+            name: opLin,
+            description: "LIN (default: false)",
+            required: false
+        },
+        // {
+        //     type: "BOOLEAN",
+        //     name: opLargeTime,
+        //     description: "Adds a large time display to the message (default: false)",
+        //     required: false
+        // }
+
         // {
         //     type: "NUMBER",
         //     name: opPersistence,
@@ -78,16 +96,44 @@ export const GamePoll: Command = {
         const poem: boolean = (interaction.options.get(opPoem)?.value ?? false) as boolean;
         const short: boolean = (interaction.options.get(opShort)?.value ?? false) as boolean;
         const backupOnly: boolean = (interaction.options.get(opBackupOnly)?.value ?? false) as boolean;
+        const lin: boolean = (interaction.options.get(opLin)?.value ?? false) as boolean;
+        const largeTime: boolean = (interaction.options.get(opLargeTime)?.value ?? false) as boolean;
 
-        const len = Object.keys(poems).length;
+        const poemsLen = Object.keys(poems).length;
+        const quotesLen = Object.keys(quotes).length;
+        LOG.info(`poemsLen: ${poemsLen}`)
+        LOG.info(`quotesLen: ${quotesLen}`)
 
-        LOG.info(`Role: ${role.name} Time: ${time} Poem: ${poem.toString()} ${len} Short ${short.toString()} BackupOnly: ${backupOnly.toString()}`);
+        LOG.info(`Role: ${role.name} Time: ${time} Poem: ${poem.toString()} Short ${short.toString()} BackupOnly: ${backupOnly.toString()} Large time: ${largeTime.toString()} Lin: ${lin.toString()}`);
 
         let content = `${role.toString()} um ${time.toLocaleString()}!`;
 
         if (poem) {
             content += "\n\n";
-            content += poems[Math.floor(Math.random() * len)];
+            content += poems[Math.floor(Math.random() * poemsLen)];
+        }
+        if (lin){
+            content += "\n\n";
+            content += quotes[Math.floor(Math.random() * quotesLen)];
+            content += "\n\n";
+        }
+
+
+        if (largeTime){
+            content += "\n\n";
+            const options: Options = {
+                font: "Big Money-ne",
+            }
+            const codeBlockWrapper = "```"
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+            const asciiArt: string = textSync(time, options)
+            let x = content + codeBlockWrapper + asciiArt
+            x =  x.trimEnd()
+            x += codeBlockWrapper
+            if (x.length < 2000) {
+                content = x
+            }
+            LOG.info(x.length)
         }
 
         const embed: MessageEmbed = createDiscordEmbed(
@@ -156,9 +202,9 @@ function createDiscordEmbed(
     if (!short) {
         messageEmbed.setDescription(createDiscordEmbedDiscription(time, role));
     }
-
     return messageEmbed;
 }
+
 
 function createDiscordEmbedDiscription(time: string, role: Role): string {
     return `${gamesConfig.generalConfig.timeText.replace("{time}", time)}
