@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { ActivityType, Client } from "discord.js";
 import { Commands } from "./command/Command";
 import handleInteractionCreate from "./handleInteractionCreate";
 import { logger as LOG } from "./logging/Logger";
@@ -22,7 +22,7 @@ function loginBot(): Client {
         LOG.info("Logged in!");
         if (client.user)
             client.user.setActivity("dir zu. Du machst das großartig!", {
-                type: "WATCHING",
+                type: ActivityType.Watching,
                 url: "https://github.com/SirMoM/GamePoll"
             });
 

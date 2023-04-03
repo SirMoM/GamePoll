@@ -1,4 +1,4 @@
-import { BaseCommandInteraction, ButtonInteraction, Client, EmbedField, Interaction, Message, MessageMentions, User } from "discord.js";
+import { ButtonInteraction, Client, CommandInteraction, EmbedBuilder, EmbedField, Interaction, Message, MessageMentions, User } from "discord.js";
 import { Command, Commands } from "./command/Command";
 import { backupButtonCustomId, imInButtonCustomId, manageRoster } from "./command/GamePoll";
 import { getGameConfigFromTag } from "./config/GamesConfig";
@@ -6,7 +6,7 @@ import { logger as LOG } from "./logging/Logger";
 
 export default (client: Client): void => {
     client.on("interactionCreate", async (interaction: Interaction) => {
-        if (interaction.isCommand() || interaction.isContextMenu()) {
+        if (interaction.isCommand() || interaction.isContextMenuCommand()) {
             LOG.info(`Handle slash-Command ${interaction.commandName}`);
             await handleSlashCommand(client, interaction);
         } else if (interaction.isButton()) {
@@ -18,7 +18,7 @@ export default (client: Client): void => {
 
 const handleSlashCommand = async (
     client: Client,
-    interaction: BaseCommandInteraction
+    interaction: CommandInteraction
 ): Promise<void> => {
     const slashCommand: Command | undefined = Commands.find(
         (c) => c.name === interaction.commandName
@@ -26,7 +26,7 @@ const handleSlashCommand = async (
     if (!slashCommand) {
         interaction
             .followUp({ content: "An error has occurred" })
-            .catch((error) => {
+            .catch((error: Error) => {
                 console.log(error);
             });
         return;
@@ -47,7 +47,7 @@ async function handleButtonInteraction(client: Client, interaction: ButtonIntera
     }
 
     const message: Message = interaction.message as Message;
-    const roleAsString: string | undefined = message.content.match(MessageMentions.ROLES_PATTERN)?.pop()
+    const roleAsString: string | undefined = message.content.match(MessageMentions.RolesPattern)?.pop()
     if (roleAsString == undefined) throw Error("Could not find role in Embed content")
     const roleID = roleAsString.substring(3, roleAsString.length-1)
     LOG.info("Role ID from message: " + roleID)
@@ -57,14 +57,15 @@ async function handleButtonInteraction(client: Client, interaction: ButtonIntera
         interaction.message.embeds[0].fields as EmbedField[],
         getGameConfigFromTag(roleID)
     );
+    
 
-    message.embeds[0].fields = fields;
-    const emb = message.embeds[0];
+    const embBuilder = EmbedBuilder.from(message.embeds[0]);
+    embBuilder.setFields(fields)
 
     if (interaction.customId == backupButtonCustomId)
-        emb.footer = {
-            text: `${interaction.member?.user.username ?? "MN33"} sucked!`
-        };
+        embBuilder.setFooter(
+            { text: `${interaction.member?.user.username ?? "MN33"} sucked!`}
+        );
 
-    await interaction.update({ embeds: [emb] });
+    await interaction.update({ embeds: [embBuilder] });
 }

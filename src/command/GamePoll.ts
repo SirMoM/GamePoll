@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { BaseCommandInteraction, Client, EmbedField, MessageActionRow, MessageButton, MessageEmbed, Role, User } from "discord.js";
+import { CommandInteraction, Client, EmbedField, Role, User, ApplicationCommandType, ApplicationCommandOptionType, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
 import { Options, textSync } from "figlet";
 import { GameConfig, gamesConfig, getGameConfigFromTag } from "../config/GamesConfig";
 import * as poemJson from "../config/poem.json";
@@ -30,41 +30,41 @@ const opLin = "lin";
 export const GamePoll: Command = {
     name: "gp",
     description: "Starts a game poll",
-    type: "CHAT_INPUT",
+    type: ApplicationCommandType.ChatInput,
     options: [
         {
-            type: "STRING",
+            type: ApplicationCommandOptionType.String,
             name: "time",
             description: "The time you want to play",
             required: true,
             autocomplete: true
         },
         {
-            type: "ROLE",
+            type:  ApplicationCommandOptionType.Role,
             name: "role",
             description: "The role to ping",
             required: true
         },
         {
-            type: "BOOLEAN",
+            type:  ApplicationCommandOptionType.Boolean,
             name: opPoem,
             description: "Print a poem message with your poll (default: false)",
             required: false
         },
         {
-            type: "BOOLEAN",
+            type: ApplicationCommandOptionType.Boolean,
             name: opShort,
             description: "Use the compact from of the poll (default: false)",
             required: false
         },
         {
-            type: "BOOLEAN",
+            type: ApplicationCommandOptionType.Boolean,
             name: opBackupOnly,
             description: "Use the backup-only from of the poll (default: false)",
             required: false
         },
         {
-            type: "BOOLEAN",
+            type: ApplicationCommandOptionType.Boolean,
             name: opLin,
             description: "LIN (default: false)",
             required: false
@@ -85,7 +85,7 @@ export const GamePoll: Command = {
         // },
     ],
 
-    run: async (client: Client, interaction: BaseCommandInteraction) => {
+    run: async (client: Client, interaction: CommandInteraction) => {
         // Option parsing
         const role = interaction.options.get("role", true).role!;
         const time = interaction.options.get("time", true).value!.toString();
@@ -136,36 +136,37 @@ export const GamePoll: Command = {
             LOG.info(x.length)
         }
 
-        const embed: MessageEmbed = createDiscordEmbed(
+        const embed: EmbedBuilder = createDiscordEmbed(
             time,
             role,
             short,
             backupOnly
         );
-        const buttons = createRosterAndBackupButtons(backupOnly);
+        const buttons: ActionRowBuilder<ButtonBuilder> = createRosterAndBackupButtons(backupOnly);
         await interaction.followUp({
             ephemeral: false,
             content: content,
+            components: [buttons],
             embeds: [embed],
-            components: [buttons]
         });
     }
 };
 
-function createRosterAndBackupButtons(backupOnly: boolean): MessageActionRow {
-    return new MessageActionRow()
+function createRosterAndBackupButtons(backupOnly: boolean): ActionRowBuilder<ButtonBuilder> {
+    const row = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(
-            new MessageButton()
+            new ButtonBuilder()
                 .setCustomId(imInButtonCustomId)
                 .setLabel(backupOnly ? fakeRosterText : imInText) // Very elegant but not so easy to read
-                .setStyle("SUCCESS")
+                .setStyle(ButtonStyle.Success)
         )
         .addComponents(
-            new MessageButton()
+            new ButtonBuilder()
                 .setCustomId(backupButtonCustomId)
                 .setLabel("Ich weiß nicht (Backup)")
-                .setStyle("SECONDARY")
+                .setStyle(ButtonStyle.Secondary)
         );
+        return row
 }
 
 function createDiscordEmbed(
@@ -173,10 +174,10 @@ function createDiscordEmbed(
     role: Role,
     short: boolean,
     backupOnly: boolean
-): MessageEmbed {
+): EmbedBuilder {
     const gameConfig: GameConfig = getGameConfigFromTag(role.id);
     LOG.info(`${role.name}: ${gameConfig.name}`);
-    const messageEmbed = new MessageEmbed()
+    const messageEmbed = new EmbedBuilder()
         .setColor(role.color)
         .setTitle(gamesConfig.generalConfig.title)
         .setTimestamp()
