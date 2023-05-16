@@ -5,7 +5,8 @@ export default function terminate(client: Client, _timeout = 500) {
     const timeout = _timeout;
     // Exit function
     const exit = (code: number) => {
-        process.exit(code);
+        LOG.error(`ExitCode ${code}`);
+        exit(code)
     };
 
     const result = (code: number, reason: string) => {
@@ -15,8 +16,9 @@ export default function terminate(client: Client, _timeout = 500) {
                 // Log error information, use a proper logging library here :)
                 LOG.error(err.message);
                 LOG.error(err.stack?.toString());
+            }else{
+                LOG.error(err)
             }
-
             // Attempt a graceful shutdown
             client.destroy();
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment

@@ -1,0 +1,9 @@
+{
+    "apps": [
+        {
+            "name": "GamePoll",
+            "script": "npm",
+            "args": "start"
+        }
+    ]
+}
