@@ -1,0 +1,444 @@
+<!doctype html>
+<!--
+  PROTOTYPE — throwaway. Lives on branch prototype/ui-improvements only; never merge.
+  Question (wayfinder ticket "Which UI improvements to ship", SirMoM/GamePoll#28):
+  what should a modernized GamePoll message look like?
+  Plan: 6 renderings of the same Poll (today's look as baseline + 5 radically different
+  variants), switchable via ?variant= and the floating bar (← / → keys). Plus the two
+  ways of *creating* a Poll (slash command + time autocomplete vs. modal).
+  Run: open this file in a browser. State is in memory only.
+-->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GamePoll UI Prototype</title>
+<style>
+  :root {
+    --dc-bg: #313338; --dc-bg2: #2b2d31; --dc-bg3: #1e1f22; --dc-text: #dbdee1; --dc-muted: #949ba4;
+    --dc-head: #f2f3f5; --dc-blurple: #5865f2; --dc-green: #248046; --dc-grey: #4e5058; --dc-red: #da373c;
+    --role: #ff1493;
+    --pt-bg: #f6f4ee; --pt-ink: #1d1b16; --pt-muted: #6b6659; --pt-line: #d9d4c7; --pt-accent: #c2410c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--pt-bg); color: var(--pt-ink); font: 14px/1.4 system-ui, sans-serif; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; min-height: 100vh; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+  /* ---------- Discord pane ---------- */
+  .discord { background: var(--dc-bg); color: var(--dc-text); padding: 24px 16px 120px;
+    font-family: "gg sans", "Noto Sans", "Helvetica Neue", Arial, sans-serif; font-size: 15px; line-height: 1.375; }
+  .discord h3.section { color: var(--dc-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 8px 56px; }
+  .msg { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 16px; padding: 4px 0; max-width: 640px; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--dc-blurple); display: grid; place-items: center; color: #fff; font-weight: 700; }
+  .avatar.user { background: #e67e22; }
+  .meta { display: flex; align-items: baseline; gap: 6px; }
+  .name { color: var(--dc-head); font-weight: 600; }
+  .apptag { background: var(--dc-blurple); color: #fff; font-size: 10px; font-weight: 600; padding: 0 4px; border-radius: 3px; line-height: 15px; }
+  .ts { color: var(--dc-muted); font-size: 12px; }
+  .reply-hint { color: var(--dc-muted); font-size: 13px; margin-bottom: 2px; }
+  .reply-hint b { color: var(--dc-text); font-weight: 600; }
+  .content { white-space: pre-wrap; word-wrap: break-word; }
+  .role { color: var(--role); background: color-mix(in srgb, var(--role) 12%, transparent); border-radius: 3px; padding: 0 2px; font-weight: 500; }
+  .umention { color: #c9cdfb; background: rgba(88,101,242,.3); border-radius: 3px; padding: 0 2px; font-weight: 500; }
+  .stamp { background: rgba(255,255,255,.06); border-radius: 3px; padding: 0 2px; }
+  .h1 { font-size: 24px; font-weight: 700; color: var(--dc-head); line-height: 1.2; margin: 4px 0; }
+  .h2 { font-size: 20px; font-weight: 700; color: var(--dc-head); line-height: 1.2; margin: 4px 0; }
+  .h3 { font-size: 16px; font-weight: 700; color: var(--dc-head); margin: 4px 0; }
+  .sub { font-size: 12px; color: var(--dc-muted); }
+  .embed { background: var(--dc-bg2); border-left: 4px solid var(--role); border-radius: 4px; padding: 8px 16px 16px 12px;
+    display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px 16px; max-width: 520px; margin-top: 4px; }
+  .embed .title { color: var(--dc-head); font-weight: 600; margin-top: 8px; }
+  .embed .desc { font-size: 14px; white-space: pre-wrap; }
+  .embed .thumb { width: 80px; height: 80px; border-radius: 4px; grid-row: 1 / span 2; grid-column: 2; margin-top: 8px; }
+  .embed .fields { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; font-size: 14px; }
+  .embed .fname { color: var(--dc-head); font-weight: 600; font-size: 14px; }
+  .embed .footer { grid-column: 1 / -1; font-size: 12px; color: var(--dc-muted); }
+  .thumb { background: linear-gradient(135deg, var(--role), #222) center/cover; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .btn { border: 0; border-radius: 8px; height: 32px; padding: 0 16px; color: #fff; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
+  .btn.success { background: var(--dc-green); } .btn.secondary { background: var(--dc-grey); }
+  .btn.primary { background: var(--dc-blurple); } .btn.danger { background: var(--dc-red); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn.small { height: 28px; padding: 0 12px; font-size: 13px; }
+  .v2 { background: var(--dc-bg2); border-left: 4px solid var(--role); border-radius: 8px; padding: 16px; max-width: 520px; margin-top: 4px; display: grid; gap: 8px; }
+  .v2 .section { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; align-items: start; }
+  .v2 .section.center { align-items: center; }
+  .v2 hr { border: 0; border-top: 1px solid rgba(255,255,255,.08); margin: 4px 0; width: 100%; }
+  .v2 .thumb { width: 84px; height: 84px; border-radius: 8px; }
+  .players { color: var(--dc-text); font-size: 14px; }
+  .empty { color: var(--dc-muted); font-style: italic; }
+  .select { background: var(--dc-bg3); border: 1px solid #1a1b1e; border-radius: 8px; height: 40px; padding: 0 12px; display: flex; align-items: center;
+    justify-content: space-between; color: var(--dc-muted); cursor: pointer; max-width: 480px; }
+  .select.open { border-color: var(--dc-blurple); }
+  .menu { background: #2b2d31; border: 1px solid #1a1b1e; border-radius: 8px; max-width: 480px; margin-top: 4px; overflow: hidden; }
+  .menu .opt { padding: 8px 12px; display: grid; grid-template-columns: 24px 1fr 20px; gap: 8px; align-items: center; cursor: pointer; }
+  .menu .opt:hover { background: rgba(255,255,255,.04); }
+  .menu .opt .d { color: var(--dc-muted); font-size: 12px; }
+  .check { width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--dc-muted); }
+  .check.on { background: var(--dc-blurple); border-color: var(--dc-blurple); }
+  .banner { border-radius: 8px; aspect-ratio: 3 / 1; display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 0 28px;
+    background: linear-gradient(110deg, #0e0f12 35%, color-mix(in srgb, var(--role) 70%, #000)); overflow: hidden; position: relative; }
+  .banner .clock { font: 700 64px/1 "Courier New", monospace; color: #ff4d4d; text-shadow: 0 0 12px rgba(255,60,60,.7); letter-spacing: 2px; }
+  .banner .game { font-weight: 800; font-size: 22px; color: #fff; text-transform: uppercase; text-align: right; }
+  .banner .game small { display: block; font-size: 12px; color: rgba(255,255,255,.7); font-weight: 600; }
+  .poll { background: var(--dc-bg2); border: 1px solid rgba(255,255,255,.06); border-radius: 8px; padding: 16px; max-width: 460px; margin-top: 4px; }
+  .poll .q { color: var(--dc-head); font-weight: 600; font-size: 17px; }
+  .poll .ans { margin-top: 8px; border-radius: 8px; background: #383a40; padding: 10px 12px; display: grid; grid-template-columns: 1fr auto; position: relative;
+    overflow: hidden; cursor: pointer; border: 2px solid transparent; }
+  .poll .ans.mine { border-color: var(--dc-blurple); }
+  .poll .ans .bar { position: absolute; inset: 0 auto 0 0; background: rgba(88,101,242,.25); }
+  .poll .ans span { position: relative; }
+  .poll .foot { display: flex; justify-content: space-between; color: var(--dc-muted); font-size: 13px; margin-top: 12px; }
+  .badge { display: inline-block; background: var(--dc-red); color: #fff; font-size: 11px; font-weight: 700; border-radius: 4px; padding: 1px 6px; vertical-align: middle; }
+
+  /* composer / autocomplete / modal */
+  .composer-wrap { max-width: 640px; margin: 0 0 28px 56px; }
+  .ac { background: var(--dc-bg2); border-radius: 8px 8px 0 0; padding: 8px 0; border: 1px solid #1a1b1e; border-bottom: 0; }
+  .ac .head { color: var(--dc-muted); font-size: 12px; text-transform: uppercase; padding: 4px 12px; font-weight: 600; }
+  .ac .item { padding: 6px 12px; display: flex; justify-content: space-between; cursor: pointer; }
+  .ac .item.sel { background: #404249; }
+  .ac .item .d { color: var(--dc-muted); font-size: 13px; }
+  .composer { background: #383a40; border-radius: 0 0 8px 8px; padding: 10px 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .composer.alone { border-radius: 8px; }
+  .chip { background: #1e1f22; border-radius: 4px; padding: 1px 6px; }
+  .chip.focus { outline: 1px solid var(--dc-blurple); }
+  .chip .k { color: var(--dc-muted); }
+  .modal { background: var(--dc-bg); border: 1px solid #1a1b1e; border-radius: 8px; max-width: 440px; box-shadow: 0 8px 24px rgba(0,0,0,.5); overflow: hidden; }
+  .modal .mh { padding: 16px; color: var(--dc-head); font-weight: 700; font-size: 20px; }
+  .modal .mb { padding: 0 16px 16px; display: grid; gap: 14px; }
+  .modal label { display: block; color: var(--dc-head); font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+  .modal .lhint { color: var(--dc-muted); font-size: 12px; margin-bottom: 6px; }
+  .modal .inp { background: var(--dc-bg3); border-radius: 8px; padding: 10px; color: var(--dc-text); }
+  .modal .inp.ph { color: var(--dc-muted); }
+  .modal .mf { background: var(--dc-bg2); padding: 16px; display: flex; justify-content: flex-end; gap: 8px; }
+  .tabs { display: inline-flex; gap: 4px; margin: 0 0 10px; }
+  .tabs button { background: transparent; border: 1px solid #4e5058; color: var(--dc-muted); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+  .tabs button.on { background: var(--dc-text); color: var(--dc-bg); border-color: var(--dc-text); }
+
+  /* ---------- prototype chrome (not part of the design) ---------- */
+  .panel { border-left: 1px solid var(--pt-line); padding: 20px 20px 120px; display: grid; gap: 18px; align-content: start; }
+  .panel h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--pt-muted); margin: 0 0 6px; }
+  .panel .vname { font-size: 20px; font-weight: 700; margin: 0; }
+  .panel ul { margin: 6px 0 0; padding-left: 18px; }
+  .panel li { margin: 3px 0; }
+  .panel .pro::marker { content: "+  "; color: #15803d; font-weight: 700; }
+  .panel .con::marker { content: "–  "; color: var(--pt-accent); font-weight: 700; }
+  .panel .needs { font-size: 12px; color: var(--pt-muted); margin-top: 8px; }
+  .panel .ctl { display: flex; flex-wrap: wrap; gap: 6px; }
+  .panel .ctl button, .panel select { background: #fff; border: 1px solid var(--pt-line); border-radius: 6px; padding: 5px 10px; font: inherit; font-size: 13px; cursor: pointer; color: var(--pt-ink); }
+  .panel pre { background: #fff; border: 1px solid var(--pt-line); border-radius: 6px; padding: 10px; font-size: 11.5px; overflow: auto; max-height: 300px; margin: 0; }
+  .switcher { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: #111; color: #fff; border-radius: 999px;
+    display: flex; align-items: center; gap: 6px; padding: 6px; box-shadow: 0 6px 24px rgba(0,0,0,.35); z-index: 10; max-width: calc(100vw - 32px); }
+  .switcher button { background: #2a2a2a; color: #fff; border: 0; width: 34px; height: 34px; border-radius: 50%; font-size: 16px; cursor: pointer; flex: none; }
+  .switcher .lbl { padding: 0 10px; font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .proto-tag { position: fixed; top: 8px; right: 8px; background: var(--pt-accent); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; z-index: 10; }
+</style>
+</head>
+<body>
+<div class="proto-tag">PROTOTYPE</div>
+<div class="layout">
+  <main class="discord" id="discord"></main>
+  <aside class="panel" id="panel"></aside>
+</div>
+<div class="switcher">
+  <button id="prev" aria-label="Vorherige Variante">←</button>
+  <div class="lbl" id="lbl"></div>
+  <button id="next" aria-label="Nächste Variante">→</button>
+</div>
+
+<script>
+// ---------- fake data ----------
+const GAMES = {
+  salz: { name: "Salz", role: "Salz", color: "#c89b3c", rosterSize: 5, options: ["Ranked", "ARAM"] },
+  cs: { name: "Gegenschlag Globale Offensive", role: "CS", color: "#ff1493", rosterSize: 5, options: ["Premier", "Wingman"] },
+  sot: { name: "Sea of ThEEEEEfs", role: "SoT", color: "#7cfcf0", rosterSize: 4, options: [] },
+};
+const ME = "Noah";
+const POOL = ["Lukas", "Mia", "Jonas", "Ben", "Lea", "Finn", "Emma", "Paul", "Hannah", "Tim"];
+
+let state;
+function reset(gameKey = state?.gameKey ?? "salz") {
+  state = {
+    gameKey, time: "20:00", expired: false, footer: null,
+    roster: ["Lukas", "Mia", "Jonas"], backup: ["Ben"],
+    options: { [GAMES[gameKey].options[0] ?? "-"]: ["Lukas", "Mia"], [GAMES[gameKey].options[1] ?? "--"]: ["Jonas"] },
+    nativeVotes: { "Bin dabei": ["Lukas", "Mia", "Jonas"], "Ich weiß nicht": ["Ben"] },
+    menuOpen: false, create: state?.create ?? "slash", acIndex: 0,
+  };
+}
+reset("salz");
+const game = () => GAMES[state.gameKey];
+
+// ---------- time helpers (Discord <t:..> renders in the viewer's locale) ----------
+function startDate() {
+  const [h, m] = state.time.split(":").map(Number);
+  const d = new Date(); d.setHours(h, m, 0, 0);
+  if (d < new Date()) d.setDate(d.getDate() + 1);
+  return d;
+}
+function rel(d) {
+  const mins = Math.round((d - new Date()) / 60000);
+  if (mins < 60) return `in ${mins} Minuten`;
+  const h = Math.round(mins / 60);
+  return `in ${h} ${h === 1 ? "Stunde" : "Stunden"}`;
+}
+const tShort = () => `<span class="stamp">${state.time}</span>`;
+const tRel = () => `<span class="stamp">${rel(startDate())}</span>`;
+const roleM = () => `<span class="role">@${game().role}</span>`;
+const userM = (u) => `<span class="umention">@${u}</span>`;
+const list = (arr, sep = "<br>") => arr.length ? arr.map(userM).join(sep) : `<span class="empty">...</span>`;
+const cap = () => game().rosterSize === -1 ? "∞" : game().rosterSize;
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+
+// ---------- actions (in-memory stand-in for the persisted Poll) ----------
+function imIn(u = ME) {
+  if (state.expired) return;
+  if (state.roster.includes(u)) { state.roster = state.roster.filter((x) => x !== u); }
+  else if (game().rosterSize === -1 || state.roster.length < game().rosterSize) {
+    state.roster.push(u); state.backup = state.backup.filter((x) => x !== u); // at most one list per Poll
+  } else if (!state.backup.includes(u)) { state.backup.push(u); }
+  render();
+}
+function backup(u = ME) {
+  if (state.expired) return;
+  if (state.backup.includes(u)) state.backup = state.backup.filter((x) => x !== u);
+  else { state.backup.push(u); state.roster = state.roster.filter((x) => x !== u); state.footer = `${u} sucked!`; }
+  render();
+}
+function toggleOption(opt, u = ME) {
+  if (state.expired) return;
+  const l = state.options[opt] ??= [];
+  state.options[opt] = l.includes(u) ? l.filter((x) => x !== u) : [...l, u];
+  if (state.options[opt].includes(u)) state.backup = state.backup.filter((x) => x !== u);
+  render();
+}
+function nativeVote(ans, u = ME) {
+  if (state.expired) return;
+  for (const k in state.nativeVotes) state.nativeVotes[k] = state.nativeVotes[k].filter((x) => x !== u);
+  state.nativeVotes[ans].push(u);
+  render();
+}
+function randomJoin() {
+  const all = new Set([...state.roster, ...state.backup, ME]);
+  const u = POOL.find((p) => !all.has(p)); if (!u) return;
+  imIn(u); for (const k in state.nativeVotes) if (k === "Bin dabei") state.nativeVotes[k].push(u);
+  const o = game().options[0]; if (o) state.options[o] = [...(state.options[o] ?? []), u];
+  render();
+}
+
+// ---------- shared message chrome ----------
+function botMsg(inner, { content = "" } = {}) {
+  return `<div class="msg"><div class="avatar">GP</div><div>
+    <div class="reply-hint">${userM(ME)} hat <b>/gp</b> benutzt</div>
+    <div class="meta"><span class="name">GamePoll</span><span class="apptag">APP</span><span class="ts">Heute um 17:12</span></div>
+    ${content ? `<div class="content">${content}</div>` : ""}${inner}</div></div>`;
+}
+const rosterLabel = () => `Roster (${state.roster.length}/${cap()})`;
+const dis = () => state.expired ? "disabled" : "";
+const expiryLine = () => state.expired ? `<span class="badge">ABGELAUFEN</span>` : `läuft ab <span class="stamp">in 24 Stunden</span>`;
+
+// ---------- variants ----------
+const VARIANTS = [
+  {
+    key: "0", name: "Heute (Ist-Zustand)",
+    notes: { pros: ["Bekannt, funktioniert"], cons: ["Uhrzeit & Spiel klein, im Fließtext versteckt", "Liste = Datenbank (Embed wird zurückgelesen)", "Text 'Bitte reagiert mit einem Emoji' veraltet", "Spieler kann auf Roster UND Backup stehen"], needs: "Baseline zum Vergleich." },
+    render: () => botMsg(`
+      <div class="embed">
+        <div><div class="title">Gayming-Anfragen</div>
+        <div class="desc">So meine Freunde <b>${state.time}</b> ist der Call!
+
+<b>Bitte reagiert mit einem Emoji sonst kann es sein, dass ihr nicht mitmachen könnt, da ggf. sonst kein Platz mehr frei ist</b>
+
+${roleM()}</div></div>
+        <div class="thumb"></div>
+        <div class="fields"><div><div class="fname">${rosterLabel()}</div>${list(state.roster)}</div><div><div class="fname">Backup</div>${list(state.backup)}</div></div>
+        <div class="footer">${state.footer ? esc(state.footer) + " • " : ""}Heute um 17:12</div>
+      </div>
+      <div class="row"><button class="btn success" ${dis()} onclick="imIn()">Bin dabei</button><button class="btn secondary" ${dis()} onclick="backup()">Ich weiß nicht (Backup)</button></div>`,
+      { content: `${roleM()} um ${state.time}!` }),
+  },
+  {
+    key: "A", name: "Embed, aufgeräumt",
+    notes: {
+      pros: ["Kleinster Umbau: Embed + Buttons bleiben", "Uhrzeit als # Überschrift + Discord-Timestamp (lokal & 'in 3 Stunden')", "Zähler direkt auf den Buttons", "Ablauf sichtbar im Footer"],
+      cons: ["Überschrift nur in der Beschreibung möglich (Embed-Titel rendert keine Timestamps)", "Bleibt 'alte' Optik, Spalten nebeneinander bleiben aber erhalten"],
+      needs: "Kein Components V2. Geht ab 14.11 schon; persistierter State statt Embed-Lesen.",
+    },
+    render: () => botMsg(`
+      <div class="embed">
+        <div><div class="title">${esc(game().name)}</div>
+        <div class="desc"><div class="h1">${state.time}</div>${tRel()} · ${state.expired ? expiryLine() : "So meine Freunde, das ist der Call!"}</div></div>
+        <div class="thumb"></div>
+        <div class="fields"><div><div class="fname">${rosterLabel()}</div>${list(state.roster)}</div><div><div class="fname">Backup (${state.backup.length})</div>${list(state.backup)}</div></div>
+        <div class="footer">${state.footer ? esc(state.footer) + " • " : ""}${state.expired ? "Abgelaufen" : "Läuft ab morgen um 17:12"}</div>
+      </div>
+      <div class="row"><button class="btn success" ${dis()} onclick="imIn()">Bin dabei · ${state.roster.length}/${cap()}</button><button class="btn secondary" ${dis()} onclick="backup()">Ich weiß nicht · ${state.backup.length}</button></div>`,
+      { content: `${roleM()} ${tShort()}` }),
+  },
+  {
+    key: "B", name: "Components V2 Karte",
+    notes: {
+      pros: ["Spiel + Uhrzeit als große Überschriften (V2 Text Display kann # / ##)", "Spielbild als Thumbnail-Accessory", "Alles in einem Container in Rollenfarbe", "-# Subtext für Ablauf/Ersteller"],
+      cons: ["Keine Inline-Spalten in V2: Roster/Backup stehen untereinander", "Kein content-Feld → Rollen-Ping muss in einen Text Display (pingt trotzdem)", "V2-Flag ist endgültig, alte Polls bleiben alt", "Limit 40 Komponenten / ~4000 Zeichen"],
+      needs: "discord.js ≥ 14.19 (14.27 geplant).",
+    },
+    render: () => botMsg(`
+      <div class="v2">
+        <div class="section"><div>
+          <div class="sub">${roleM()} · ${esc(game().name)}</div>
+          <div class="h1">${state.time} Uhr</div>
+          <div>${tRel()} · ${state.expired ? expiryLine() : "So meine Freunde, das ist der Call!"}</div>
+        </div><div class="thumb"></div></div>
+        <hr>
+        <div><div class="h3">✅ ${rosterLabel()}</div><div class="players">${list(state.roster, " ")}</div></div>
+        <div><div class="h3">🤷 Backup (${state.backup.length})</div><div class="players">${list(state.backup, " ")}</div></div>
+        <hr>
+        <div class="row" style="margin:0"><button class="btn success" ${dis()} onclick="imIn()">Bin dabei</button><button class="btn secondary" ${dis()} onclick="backup()">Ich weiß nicht</button></div>
+        <div class="sub">gestartet von ${userM(ME)} · ${expiryLine()}${state.footer ? " · " + esc(state.footer) : ""}</div>
+      </div>`),
+  },
+  {
+    key: "C", name: "Abstimmung (Optionen, Select-Menü)",
+    notes: {
+      pros: ["Inspiriert von 'Abstimmung im Poll': Presets je Spiel (z. B. Ranked / ARAM)", "Ein Select-Menü (Mehrfachauswahl) statt Button pro Option, skaliert auf bis zu 25 Optionen", "Jede Option zeigt eigene Liste"],
+      cons: ["Select ist zwei Klicks statt einer", "Was ist das Roster? Summe aller Optionen? Cap pro Option?", "Optionen woher: Preset in gamesConfig oder frei beim Erstellen?"],
+      needs: "≥ 14.19 für V2; Select geht auch klassisch. Spiele ohne Presets fallen auf B zurück.",
+    },
+    render: () => {
+      const opts = game().options;
+      if (!opts.length) return botMsg(`<div class="v2"><div class="sub">Dieses Spiel hat keine Presets → würde wie Variante B aussehen. Wechsle im Panel auf Salz oder CS.</div></div>`);
+      const mineIn = (o) => (state.options[o] ?? []).includes(ME);
+      const sections = opts.map((o) => `<div><div class="h3">${esc(o)} (${(state.options[o] ?? []).length})</div><div class="players">${list(state.options[o] ?? [], " ")}</div></div>`).join("");
+      const menu = state.menuOpen ? `<div class="menu">${[...opts, "Backup"].map((o) => {
+        const on = o === "Backup" ? state.backup.includes(ME) : mineIn(o);
+        const desc = o === "Backup" ? "Ich weiß nicht" : `${(state.options[o] ?? []).length} dabei`;
+        return `<div class="opt" onclick="${o === "Backup" ? "backup()" : `toggleOption('${o}')`}"><span>${o === "Backup" ? "🤷" : "🎮"}</span><div>${esc(o)}<div class="d">${desc}</div></div><div class="check ${on ? "on" : ""}"></div></div>`;
+      }).join("")}</div>` : "";
+      const mine = [...opts.filter(mineIn), ...(state.backup.includes(ME) ? ["Backup"] : [])];
+      return botMsg(`
+      <div class="v2">
+        <div class="section center"><div><div class="sub">${roleM()} · ${esc(game().name)}</div><div class="h2">${state.time} Uhr · ${tRel()}</div></div><div class="thumb" style="width:56px;height:56px"></div></div>
+        <hr>${sections}
+        <div><div class="h3">🤷 Backup (${state.backup.length})</div><div class="players">${list(state.backup, " ")}</div></div>
+        <div class="select ${state.menuOpen ? "open" : ""}" onclick="${state.expired ? "" : "state.menuOpen=!state.menuOpen;render()"}">
+          <span>${mine.length ? "Du: " + mine.map(esc).join(", ") : "Wofür bist du dabei? (Mehrfachauswahl)"}</span><span>⌄</span></div>${menu}
+        <div class="sub">${expiryLine()}</div>
+      </div>`);
+    },
+  },
+  {
+    key: "D", name: "Native Discord-Umfrage",
+    notes: {
+      pros: ["Null eigene UI: Discord zeichnet alles, auch auf Mobile", "Mehrere Antworten (Presets) gratis", "Ablauf eingebaut (1 h – 32 Tage)"],
+      cons: ["Kein Roster-Limit, keine Überlauf-Logik ins Backup", "Namen nur hinter 'Ergebnisse anzeigen', nicht direkt sichtbar", "Bot kann Umfrage nach dem Senden nicht ändern; kein Spielbild, keine Rollenfarbe", "Rollen-Ping muss eine extra Nachricht sein", "Kein 'sucked!'-Footer, keine Persönlichkeit"],
+      needs: "≥ 14.15. Join history käme über Poll-Vote-Events (Intent GuildMessagePolls).",
+    },
+    render: () => {
+      const answers = ["Bin dabei", "Ich weiß nicht"];
+      const total = answers.reduce((n, a) => n + state.nativeVotes[a].length, 0) || 1;
+      return botMsg(`
+      <div class="poll">
+        <div class="q">${esc(game().name)} um ${state.time} — wer ist dabei?</div>
+        <div class="sub">Wähle eine Antwort</div>
+        ${answers.map((a) => {
+          const n = state.nativeVotes[a].length, pct = Math.round((n / total) * 100), mine = state.nativeVotes[a].includes(ME);
+          return `<div class="ans ${mine ? "mine" : ""}" onclick="nativeVote('${a}')"><div class="bar" style="width:${pct}%"></div><span>${a === "Bin dabei" ? "✅" : "🤷"} ${a}</span><span>${n} · ${pct}%</span></div>`;
+        }).join("")}
+        <div class="foot"><span>${total} Stimmen · ${state.expired ? "Endgültige Ergebnisse" : "noch 24 Std"}</span><span style="color:#00a8fc">Ergebnisse anzeigen</span></div>
+      </div>`, { content: `${roleM()} ${tShort()} ↓` });
+    },
+  },
+  {
+    key: "E", name: "Banner (Uhrzeit als Bild)",
+    notes: {
+      pros: ["Die 'Übelst premium'-Idee aus 'Bessere Visibility': Spiel + Uhrzeit als Bild-Banner", "Sieht im Feed sofort, worum es geht", "Kompakte Listen darunter"],
+      cons: ["Bild muss serverseitig erzeugt werden (z. B. @napi-rs/canvas) → neue Abhängigkeit, Fonts auf dem VPS", "Uhrzeit im Bild ist NICHT in Zeitzone des Lesers (Timestamp schon)", "Neues Bild bei jeder Uhrzeit; beim Ändern neu hochladen", "Spielbilder aus gamesConfig sind teils tote Links"],
+      needs: "V2 Media Gallery (≥ 14.19) + Bildgenerierung.",
+    },
+    render: () => botMsg(`
+      <div class="v2" style="padding:12px">
+        <div class="banner"><div class="clock">${state.time}</div><div class="game">${esc(game().name)}<small>${rel(startDate())}</small></div></div>
+        <div class="players"><b>Roster ${state.roster.length}/${cap()}:</b> ${list(state.roster, " ")}</div>
+        <div class="players"><b>Backup:</b> ${list(state.backup, " ")}</div>
+        <div class="row" style="margin:0"><button class="btn success small" ${dis()} onclick="imIn()">Bin dabei</button><button class="btn secondary small" ${dis()} onclick="backup()">Backup</button><span class="sub" style="align-self:center">${expiryLine()}</span></div>
+      </div>`, { content: roleM() }),
+  },
+];
+
+// ---------- creating a Poll: slash + autocomplete vs. modal ----------
+function acSuggestions() {
+  const now = new Date(), out = [];
+  const next = new Date(now); next.setMinutes(next.getMinutes() < 30 ? 30 : 60, 0, 0);
+  out.push(["Jetzt", "sofort"]);
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(next.getTime() + i * 30 * 60000);
+    out.push([`${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`, d.getDate() === now.getDate() ? "heute" : "morgen"]);
+  }
+  out.push(["20:00", "der Klassiker"]);
+  return out;
+}
+function creation() {
+  const tabs = `<div class="tabs"><button class="${state.create === "slash" ? "on" : ""}" onclick="state.create='slash';render()">/gp + Autocomplete</button><button class="${state.create === "modal" ? "on" : ""}" onclick="state.create='modal';render()">/gp → Modal</button></div>`;
+  if (state.create === "slash") {
+    const s = acSuggestions();
+    return `<div class="composer-wrap">${tabs}
+      <div class="ac"><div class="head">time</div>${s.map(([v, d], i) => `<div class="item ${i === state.acIndex ? "sel" : ""}" onclick="pickTime('${v}',${i})"><span>${v}</span><span class="d">${d}</span></div>`).join("")}</div>
+      <div class="composer"><b>/gp</b><span class="chip focus"><span class="k">time:</span> ${s[state.acIndex][0]}</span><span class="chip"><span class="k">role:</span> @${game().role}</span><span class="chip"><span class="k">poem</span></span><span class="chip"><span class="k">short</span></span><span class="chip"><span class="k">backup-only</span></span><span class="chip"><span class="k">lin</span></span></div></div>`;
+  }
+  return `<div class="composer-wrap">${tabs}
+    <div class="composer alone" style="margin-bottom:10px"><b>/gp</b><span class="chip"><span class="k">role:</span> @${game().role}</span></div>
+    <div class="modal"><div class="mh">Neue GamePoll</div><div class="mb">
+      <div><label>Uhrzeit</label><div class="lhint">z. B. 20:00, jetzt, in 30 min</div><div class="inp">${state.time}</div></div>
+      <div><label>Optionen</label><div class="lhint">Optional, kommagetrennt. Leer = Bin dabei / Backup</div><div class="inp ${game().options.length ? "" : "ph"}">${game().options.join(", ") || "Ranked, ARAM"}</div></div>
+      <div><label>Extras</label><div class="inp">☐ Gedicht &nbsp; ☐ Kurz &nbsp; ☐ Nur Backup &nbsp; ☐ LIN</div></div>
+      <div><label>Läuft ab nach</label><div class="inp">24 Stunden ⌄</div></div>
+    </div><div class="mf"><button class="btn secondary">Abbrechen</button><button class="btn primary">Poll starten</button></div></div></div>`;
+}
+function pickTime(v, i) { state.acIndex = i; if (/^\d\d:\d\d$/.test(v)) state.time = v; render(); }
+
+// ---------- prototype chrome ----------
+const params = new URLSearchParams(location.search);
+let vi = Math.max(0, VARIANTS.findIndex((v) => v.key === (params.get("variant") ?? "B")));
+function go(d) {
+  vi = (vi + d + VARIANTS.length) % VARIANTS.length; state.menuOpen = false;
+  const p = new URLSearchParams(location.search); p.set("variant", VARIANTS[vi].key);
+  history.replaceState(null, "", "?" + p); render();
+}
+document.getElementById("prev").onclick = () => go(-1);
+document.getElementById("next").onclick = () => go(1);
+document.addEventListener("keydown", (e) => {
+  if (e.target.closest("input, textarea, select, [contenteditable]")) return;
+  if (e.key === "ArrowLeft") go(-1); if (e.key === "ArrowRight") go(1);
+});
+
+function render() {
+  const v = VARIANTS[vi];
+  document.documentElement.style.setProperty("--role", game().color);
+  document.getElementById("discord").innerHTML =
+    `<h3 class="section">Poll erstellen</h3>${creation()}<h3 class="section">Poll-Nachricht</h3>${v.render()}`;
+  document.getElementById("lbl").textContent = `${v.key} · ${v.name}  (${vi + 1}/${VARIANTS.length})`;
+  const { pros, cons, needs } = v.notes;
+  const snapshot = { variant: v.key, game: game().name, time: state.time, expired: state.expired, roster: state.roster, backup: state.backup,
+    ...(v.key === "C" ? { options: state.options } : {}), ...(v.key === "D" ? { nativeVotes: state.nativeVotes } : {}), footer: state.footer };
+  document.getElementById("panel").innerHTML = `
+    <div><h2>Variante</h2><p class="vname">${v.key} · ${esc(v.name)}</p>
+      <ul>${pros.map((p) => `<li class="pro">${esc(p)}</li>`).join("")}${cons.map((c) => `<li class="con">${esc(c)}</li>`).join("")}</ul>
+      <div class="needs">${esc(needs)}</div></div>
+    <div><h2>Simulieren</h2><div class="ctl">
+      <select onchange="reset(this.value);render()">${Object.entries(GAMES).map(([k, g]) => `<option value="${k}" ${k === state.gameKey ? "selected" : ""}>${esc(g.name)} (Cap ${g.rosterSize})</option>`).join("")}</select>
+      <button onclick="randomJoin()">+ Spieler tritt bei</button>
+      <button onclick="state.expired=!state.expired;state.menuOpen=false;render()">${state.expired ? "Wieder öffnen" : "Ablaufen lassen"}</button>
+      <button onclick="reset();render()">Reset</button></div>
+      <div class="needs">Du bist ${ME}. Klick die Buttons in der Nachricht.</div></div>
+    <div><h2>Poll-State (würde in SQLite stehen)</h2><pre>${esc(JSON.stringify(snapshot, null, 2))}</pre></div>
+    <div><h2>Fragen an dich</h2><ul>
+      <li>Welche Variante — oder welche Teile aus welchen?</li>
+      <li>Optionen/Presets (C): rein, später, oder raus?</li>
+      <li>Erstellen: Slash + Autocomplete, Modal, oder beides?</li>
+      <li>Rollen-Ping im Text behalten? Gedicht / LIN / 'sucked!' behalten?</li></ul></div>`;
+}
+render();
+</script>
+</body>
+</html>
