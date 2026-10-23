@@ -26,8 +26,11 @@ _Avoid_: stand-in, reserve, data backup
 **Backup-only Poll**:
 A Poll where every answer lands on the Backup; nobody commits to a Roster.
 
+**Start time**:
+When the Game is meant to start, as the Poll's creator wrote it — free text, shown as written ("20:00", "nächsten Montag 21 Uhr").
+
 **Expiry**:
-The moment a Poll stops accepting answers (default lifetime 24h).
+The moment a Poll stops accepting answers (default 3h). Counted from the Start time when that is a plain time of day, otherwise from when the Poll was created. A Poll may also never expire.
 _Avoid_: persistence, timeout
 
 **Join history**:
