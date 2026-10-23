@@ -203,7 +203,7 @@ function imIn(u = ME) {
 function backup(u = ME) {
   if (state.expired) return;
   if (state.backup.includes(u)) state.backup = state.backup.filter((x) => x !== u);
-  else { state.backup.push(u); state.roster = state.roster.filter((x) => x !== u); state.footer = `${u} sucked!`; }
+  else { state.backup.push(u); state.roster = state.roster.filter((x) => x !== u); }
   render();
 }
 function toggleOption(opt, u = ME) {
@@ -364,6 +364,22 @@ ${roleM()}</div></div>
         <div class="row" style="margin:0"><button class="btn success small" ${dis()} onclick="imIn()">Bin dabei</button><button class="btn secondary small" ${dis()} onclick="backup()">Backup</button><span class="sub" style="align-self:center">${expiryLine()}</span></div>
       </div>`, { content: roleM() }),
   },
+  {
+    key: "F", name: "Banner + Embed-Spalten (E + A)",
+    notes: {
+      pros: ["Banner aus E: Spiel + Uhrzeit sofort sichtbar", "Roster | Backup nebeneinander wie A (geht nur im klassischen Embed, nicht in V2)", "Zähler auf den Buttons, Ablauf im Footer", "Kein Components V2 nötig"],
+      cons: ["Banner ist ein Bild-Anhang über dem Embed (Embed-Bild würde UNTER den Spalten landen)", "Bildgenerierung serverseitig (@napi-rs/canvas o. ä.) + Font auf dem VPS", "Uhrzeit im Bild fest in deutscher Zeit; der Timestamp daneben bleibt lokal"],
+      needs: "Klassisches Embed + Attachment; Reihenfolge Anhang/Embed bei Umsetzung verifizieren.",
+    },
+    render: () => botMsg(`
+      <div class="banner" style="max-width:520px;margin-top:4px"><div class="clock">${state.time}</div><div class="game">${esc(game().name)}<small>${rel(startDate())}</small></div></div>
+      <div class="embed">
+        <div class="fields" style="grid-column:1/-1"><div><div class="fname">${rosterLabel()}</div>${list(state.roster)}</div><div><div class="fname">Backup (${state.backup.length})</div>${list(state.backup)}</div></div>
+        <div class="footer">${state.footer ? esc(state.footer) + " • " : ""}${state.expired ? "Abgelaufen" : "Läuft ab morgen um 17:12"}</div>
+      </div>
+      <div class="row"><button class="btn success" ${dis()} onclick="imIn()">Bin dabei · ${state.roster.length}/${cap()}</button><button class="btn secondary" ${dis()} onclick="backup()">Ich weiß nicht · ${state.backup.length}</button></div>`,
+      { content: `${roleM()} ${tShort()} · ${tRel()}` }),
+  },
 ];
 
 // ---------- creating a Poll: slash + autocomplete vs. modal ----------
@@ -390,7 +406,6 @@ function creation() {
     <div class="composer alone" style="margin-bottom:10px"><b>/gp</b><span class="chip"><span class="k">role:</span> @${game().role}</span></div>
     <div class="modal"><div class="mh">Neue GamePoll</div><div class="mb">
       <div><label>Uhrzeit</label><div class="lhint">z. B. 20:00, jetzt, in 30 min</div><div class="inp">${state.time}</div></div>
-      <div><label>Optionen</label><div class="lhint">Optional, kommagetrennt. Leer = Bin dabei / Backup</div><div class="inp ${game().options.length ? "" : "ph"}">${game().options.join(", ") || "Ranked, ARAM"}</div></div>
       <div><label>Extras</label><div class="inp">☐ Gedicht &nbsp; ☐ Kurz &nbsp; ☐ Nur Backup &nbsp; ☐ LIN</div></div>
       <div><label>Läuft ab nach</label><div class="inp">24 Stunden ⌄</div></div>
     </div><div class="mf"><button class="btn secondary">Abbrechen</button><button class="btn primary">Poll starten</button></div></div></div>`;
@@ -413,6 +428,8 @@ document.addEventListener("keydown", (e) => {
 });
 
 function render() {
+  // "X sucked!" = most recent Player still on the Backup; empty Backup → no footer
+  state.footer = state.backup.length ? `${state.backup.at(-1)} sucked!` : null;
   const v = VARIANTS[vi];
   document.documentElement.style.setProperty("--role", game().color);
   document.getElementById("discord").innerHTML =
