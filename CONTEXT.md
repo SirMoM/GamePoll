@@ -26,6 +26,9 @@ _Avoid_: stand-in, reserve, data backup
 **Backup-only Poll**:
 A Poll where every answer lands on the Backup; nobody commits to a Roster.
 
+**Answer**:
+A Player's current position on a Poll: on the Roster or on the Backup. At most one per Player per Poll; clicking the other button moves it, clicking the same one removes it.
+
 **Start time**:
 When the Game is meant to start, as the Poll's creator wrote it — free text, shown as written ("20:00", "nächsten Montag 21 Uhr").
 
@@ -33,8 +36,11 @@ When the Game is meant to start, as the Poll's creator wrote it — free text, s
 The moment a Poll stops accepting answers (default 3h). Counted from the Start time when that is a plain time of day, otherwise from when the Poll was created. A Poll may also never expire.
 _Avoid_: persistence, timeout
 
+**Closed**:
+A Poll that no longer takes Answers — because its Expiry passed or its Discord message was deleted. A Closed Poll and its Join history are kept.
+
 **Join history**:
-The recorded record of which Players answered which Polls, kept after the Poll expires.
+The append-only record of every Answer change (join, move, leave) on every Poll, kept after the Poll is Closed.
 _Avoid_: stats (stats are a view over the Join history)
 
 ## Relationships
@@ -42,6 +48,7 @@ _Avoid_: stats (stats are a view over the Join history)
 - A **Poll** is about exactly one **Game**
 - A **Poll** has one **Roster** and one **Backup**; a **Player** is on at most one of them per Poll
 - A **Poll** belongs to one Discord server (guild)
+- A **Roster** has an optional size limit from the Game's config; when it is full, a join lands on the **Backup**. Nothing is promoted automatically
 - **Join history** outlives the **Poll** it was recorded from
 
 ## Flagged ambiguities
